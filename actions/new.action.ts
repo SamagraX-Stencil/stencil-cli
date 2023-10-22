@@ -70,6 +70,9 @@ const getApplicationNameInput = (inputs: Input[]) =>
 const getPackageManagerInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'packageManager');
 
+const getPrismaInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'prisma');
+
 const getProjectDirectory = (
   applicationName: Input,
   directoryOption?: Input,
@@ -92,6 +95,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     const questions = [generateInput('name', message)('nest-app')];
     const answers: Answers = await prompt(questions as ReadonlyArray<Question>);
     replaceInputMissingInformation(inputs, answers);
+  }
+
+  const prismaInput = getPrismaInput(options);
+  if (!prismaInput!.value) {
+    const answers = await askForPrisma();
+    replaceInputMissingInformation(options, answers);
   }
 
   const packageManagerInput = getPackageManagerInput(options);
@@ -167,8 +176,15 @@ const askForPackageManager = async (): Promise<Answers> => {
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
       PackageManager.NPM,
       PackageManager.YARN,
-      PackageManager.PNPM,
     ]),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForPrisma = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('prisma')(MESSAGES.PRISMA_QUESTION)(['yes', 'no']),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
@@ -200,6 +216,8 @@ const createGitIgnoreFile = (dir: string, content?: string) => {
   }
   return fs.promises.writeFile(filePath, fileContent);
 };
+
+const initialzePrisma = (dir: string) => {};
 
 const printCollective = () => {
   const dim = print('dim');
