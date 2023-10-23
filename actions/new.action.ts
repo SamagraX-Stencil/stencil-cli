@@ -163,8 +163,6 @@ const installPackages = async (
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
 
-  console.info(shouldInitializePrima);
-
   let packageManager: AbstractPackageManager;
   if (dryRunMode) {
     console.info();
@@ -175,10 +173,6 @@ const installPackages = async (
 
   try {
     packageManager = PackageManagerFactory.create(inputPackageManager);
-
-    console.info(packageManager);
-    console.info(inputPackageManager);
-
     await packageManager.install(
       installDirectory,
       inputPackageManager,
@@ -188,12 +182,6 @@ const installPackages = async (
     if (error && error.message) {
       console.error(chalk.red(error.message));
     }
-  }
-
-  if (shouldInitializePrima) {
-    console.info();
-    console.info(chalk.blue(MESSAGES.PRISMA_INITIALIZATION_IN_PROGRESS));
-    console.info();
   }
 };
 

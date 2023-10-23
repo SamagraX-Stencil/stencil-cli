@@ -19,6 +19,8 @@ export const MESSAGES = {
   PRISMA_INSTALLATION_FAILURE: `Prisma and prisma client could not be succesfully installed`,
   PRISMA_SCHEMA_INITIALIZATION: `Starting the prisma schema initialization`,
   PRISMA_SCHEMA_INITIALIZATION_ERROR: `Failed to run the npx prisma init command`,
+  PRISMA_SERVICE_INITIALIZATION: `Generating the prisma service files`,
+  PRISMA_SERVICE_INITIALIZATION_ERROR: `Failed to generate the prisma service files`,
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,

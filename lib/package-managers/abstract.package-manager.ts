@@ -8,6 +8,7 @@ import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
 import { PackageManagerCommands } from './package-manager-commands';
 import { ProjectDependency } from './project.dependency';
 import { NpxRunner } from '../runners/npx.runner';
+import { NestRunner } from '../runners/nest.runner';
 
 export abstract class AbstractPackageManager {
   constructor(protected runner: AbstractRunner) {}
@@ -56,6 +57,8 @@ export abstract class AbstractPackageManager {
           isPrismaInstalled = true;
 
           await this.initializePrisma(normalizedDirectory);
+
+          await this.initialsePrismaService(normalizedDirectory);
         } catch (error) {
           console.error(chalk.red(MESSAGES.PRISMA_INSTALLATION_FAILURE));
         }
@@ -229,6 +232,25 @@ export abstract class AbstractPackageManager {
       );
     } catch (error) {
       console.error(chalk.red(MESSAGES.PRISMA_SCHEMA_INITIALIZATION_ERROR));
+    }
+  }
+
+  public async initialsePrismaService(
+    normalizedDirectory: string,
+  ): Promise<void> {
+    const nestRunner = new NestRunner();
+    const prismaServiceInitCommand = 'g service-prisma prisma';
+    const commandArgs = `${prismaServiceInitCommand}`;
+
+    try {
+      console.info(MESSAGES.PRISMA_SERVICE_INITIALIZATION);
+      await nestRunner.run(
+        commandArgs,
+        false,
+        join(process.cwd(), normalizedDirectory),
+      );
+    } catch (error) {
+      console.error(chalk.red(MESSAGES.PRISMA_SERVICE_INITIALIZATION_ERROR));
     }
   }
 
