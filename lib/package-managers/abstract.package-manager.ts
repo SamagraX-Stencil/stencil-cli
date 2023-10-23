@@ -11,7 +11,11 @@ import { ProjectDependency } from './project.dependency';
 export abstract class AbstractPackageManager {
   constructor(protected runner: AbstractRunner) {}
 
-  public async install(directory: string, packageManager: string) {
+  public async install(
+    directory: string,
+    packageManager: string,
+    shouldInitializePrisma?: boolean,
+  ) {
     const spinner = ora({
       spinner: {
         interval: 120,
@@ -22,13 +26,37 @@ export abstract class AbstractPackageManager {
     spinner.start();
     try {
       const commandArgs = `${this.cli.install} ${this.cli.silentFlag}`;
+
+      console.info('this is commandArgs');
+      console.info(this.cli.install);
+
       const collect = true;
       const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
+
+      //general installtion of packages
       await this.runner.run(
         commandArgs,
         collect,
         join(process.cwd(), normalizedDirectory),
       );
+      // if user has wants prisma, then install prisma and @prisma/client
+      if (shouldInitializePrisma) {
+        const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
+        const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
+
+        await this.runner.run(
+          prismaCommandArg,
+          collect,
+          join(process.cwd(), normalizedDirectory),
+        );
+
+        await this.runner.run(
+          prismaClientCommandArg,
+          collect,
+          join(process.cwd(), normalizedDirectory),
+        );
+      }
+
       spinner.succeed();
       console.info();
       console.info(MESSAGES.PACKAGE_MANAGER_INSTALLATION_SUCCEED(directory));

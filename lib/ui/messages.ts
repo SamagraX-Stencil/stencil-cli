@@ -11,6 +11,7 @@ export const MESSAGES = {
     `\nFailed to execute command: ${command}`,
   PACKAGE_MANAGER_QUESTION: `Which package manager would you ${EMOJIS.HEART}  to use?`,
   PRISMA_QUESTION: 'Do you want to have prisma setup?',
+  PRISMA_INITIALIZATION_IN_PROGRESS: `Prisma initialization in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,

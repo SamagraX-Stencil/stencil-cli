@@ -110,10 +110,15 @@ export class NestCollection extends AbstractCollection {
       alias: 'app',
       description: 'Generate a new application within a monorepo',
     },
+    {
+      name: 'service-prisma',
+      alias: 'sp',
+      description: 'Generate the Prisma service file',
+    },
   ];
 
   constructor(runner: AbstractRunner) {
-    super('@nestjs/schematics', runner);
+    super('@soorajk1/schematics', runner);
   }
 
   public async execute(name: string, options: SchematicOption[]) {

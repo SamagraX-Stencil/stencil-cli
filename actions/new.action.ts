@@ -37,9 +37,15 @@ export class NewAction extends AbstractAction {
     const shouldSkipInstall = options.some(
       (option) => option.name === 'skip-install' && option.value === true,
     );
+
     const shouldSkipGit = options.some(
       (option) => option.name === 'skip-git' && option.value === true,
     );
+
+    const shouldInitializePrima = options.some(
+      (option) => option.name === 'prisma' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -50,8 +56,10 @@ export class NewAction extends AbstractAction {
         options,
         isDryRunEnabled as boolean,
         projectDirectory,
+        shouldInitializePrima as boolean,
       );
     }
+
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
@@ -151,8 +159,11 @@ const installPackages = async (
   options: Input[],
   dryRunMode: boolean,
   installDirectory: string,
+  shouldInitializePrima: boolean,
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
+
+  console.info(shouldInitializePrima);
 
   let packageManager: AbstractPackageManager;
   if (dryRunMode) {
@@ -161,13 +172,28 @@ const installPackages = async (
     console.info();
     return;
   }
+
   try {
     packageManager = PackageManagerFactory.create(inputPackageManager);
-    await packageManager.install(installDirectory, inputPackageManager);
+
+    console.info(packageManager);
+    console.info(inputPackageManager);
+
+    await packageManager.install(
+      installDirectory,
+      inputPackageManager,
+      shouldInitializePrima,
+    );
   } catch (error) {
     if (error && error.message) {
       console.error(chalk.red(error.message));
     }
+  }
+
+  if (shouldInitializePrima) {
+    console.info();
+    console.info(chalk.blue(MESSAGES.PRISMA_INITIALIZATION_IN_PROGRESS));
+    console.info();
   }
 };
 

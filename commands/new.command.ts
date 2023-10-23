@@ -32,7 +32,10 @@ export class NewCommand extends AbstractCommand {
         Collection.NESTJS,
       )
       .option('--strict', 'Enables strict mode in TypeScript.', false)
-      .option('-ps, --prisma', 'If you want prisma setup in the project')
+      .option(
+        '-ps, --prisma [prisma]',
+        'If you want prisma setup in the project',
+      )
       .action(async (name: string, command: Command) => {
         const options: Input[] = [];
         const availableLanguages = ['js', 'ts', 'javascript', 'typescript'];
@@ -47,6 +50,7 @@ export class NewCommand extends AbstractCommand {
         });
         options.push({ name: 'collection', value: command.collection });
         options.push({ name: 'prisma', value: command.prisma });
+        console.log('in the new command');
 
         if (!!command.language) {
           const lowercasedLanguage = command.language.toLowerCase();
