@@ -37,11 +37,9 @@ export abstract class AbstractPackageManager {
         collect,
         join(process.cwd(), normalizedDirectory),
       );
-      var isPrismaInstalled = false;
       if (shouldInitializePrisma) {
         try {
           const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
-          const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
 
           await this.runner.run(
             prismaCommandArg,
@@ -49,16 +47,16 @@ export abstract class AbstractPackageManager {
             join(process.cwd(), normalizedDirectory),
           );
 
+          const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
           await this.runner.run(
             prismaClientCommandArg,
             collect,
             join(process.cwd(), normalizedDirectory),
           );
-          isPrismaInstalled = true;
 
-          await this.initializePrisma(normalizedDirectory);
+          // await this.initializePrisma(normalizedDirectory);
 
-          await this.initialsePrismaService(normalizedDirectory);
+          // await this.initialsePrismaService(normalizedDirectory);
         } catch (error) {
           console.error(chalk.red(MESSAGES.PRISMA_INSTALLATION_FAILURE));
         }

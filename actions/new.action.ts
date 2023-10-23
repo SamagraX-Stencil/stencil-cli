@@ -22,6 +22,7 @@ import {
 import { EMOJIS, MESSAGES } from '../lib/ui';
 import { normalizeToKebabOrSnakeCase } from '../lib/utils/formatting';
 import { AbstractAction } from './abstract.action';
+import { ClassPrisma } from '../lib/prisma';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -54,6 +55,12 @@ export class NewAction extends AbstractAction {
     if (!shouldSkipInstall) {
       await installPackages(
         options,
+        isDryRunEnabled as boolean,
+        projectDirectory,
+        shouldInitializePrima as boolean,
+      );
+
+      await createPrismaFiles(
         isDryRunEnabled as boolean,
         projectDirectory,
         shouldInitializePrima as boolean,
@@ -185,6 +192,28 @@ const installPackages = async (
   }
 };
 
+const createPrismaFiles = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializePrima: boolean,
+) => {
+  if (!shouldInitializePrima) {
+    return;
+  }
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+  const prismaInstance = new ClassPrisma();
+  try {
+    await prismaInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not generate the prisma files successfully');
+  }
+};
+
 const askForPackageManager = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
@@ -230,8 +259,6 @@ const createGitIgnoreFile = (dir: string, content?: string) => {
   }
   return fs.promises.writeFile(filePath, fileContent);
 };
-
-const initialzePrisma = (dir: string) => {};
 
 const printCollective = () => {
   const dim = print('dim');

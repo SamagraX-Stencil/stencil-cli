@@ -3,4 +3,6 @@ export enum Runner {
   NPM,
   YARN,
   PNPM,
+  NPX,
+  NEST,
 }
