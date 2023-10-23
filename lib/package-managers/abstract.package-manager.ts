@@ -7,6 +7,7 @@ import { MESSAGES } from '../ui';
 import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
 import { PackageManagerCommands } from './package-manager-commands';
 import { ProjectDependency } from './project.dependency';
+import { NpxRunner } from '../runners/npx.runner';
 
 export abstract class AbstractPackageManager {
   constructor(protected runner: AbstractRunner) {}
@@ -27,26 +28,19 @@ export abstract class AbstractPackageManager {
     try {
       const commandArgs = `${this.cli.install} ${this.cli.silentFlag}`;
 
-      console.info('this is commandArgs');
-      console.info(this.cli.install);
-
       const collect = true;
       const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
 
-      //general installtion of packages
       await this.runner.run(
         commandArgs,
         collect,
         join(process.cwd(), normalizedDirectory),
       );
       var isPrismaInstalled = false;
-      // if user has wants prisma, then install prisma and @prisma/client
       if (shouldInitializePrisma) {
         try {
           const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
           const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
-
-          console.info(MESSAGES.PRISMA_INSTALLATION_START);
 
           await this.runner.run(
             prismaCommandArg,
@@ -60,16 +54,10 @@ export abstract class AbstractPackageManager {
             join(process.cwd(), normalizedDirectory),
           );
           isPrismaInstalled = true;
-          console.info(MESSAGES.PRISMA_INSTALLATION_SUCCESS);
+
+          await this.initializePrisma(normalizedDirectory);
         } catch (error) {
           console.error(chalk.red(MESSAGES.PRISMA_INSTALLATION_FAILURE));
-        }
-      }
-
-      if (isPrismaInstalled) {
-        try {
-        } catch (error) {
-          console.error(chalk.red());
         }
       }
 
@@ -224,6 +212,24 @@ export abstract class AbstractPackageManager {
   public async delete(commandArguments: string) {
     const collect = true;
     await this.runner.run(commandArguments, collect);
+  }
+
+  public async initializePrisma(normalizedDirectory: string): Promise<void> {
+    const npxRunner = new NpxRunner();
+    const prismaInitCommand = 'prisma init';
+    const commandArgs = `${prismaInitCommand}`;
+
+    try {
+      console.info(MESSAGES.PRISMA_SCHEMA_INITIALIZATION);
+
+      await npxRunner.run(
+        commandArgs,
+        false,
+        join(process.cwd(), normalizedDirectory),
+      );
+    } catch (error) {
+      console.error(chalk.red(MESSAGES.PRISMA_SCHEMA_INITIALIZATION_ERROR));
+    }
   }
 
   public abstract get name(): string;
