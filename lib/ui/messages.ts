@@ -12,6 +12,13 @@ export const MESSAGES = {
   PACKAGE_MANAGER_QUESTION: `Which package manager would you ${EMOJIS.HEART}  to use?`,
   PRISMA_QUESTION: 'Do you want to have prisma setup?',
   PRISMA_INITIALIZATION_IN_PROGRESS: `Prisma initialization in progress... ${EMOJIS.COFFEE}`,
+  PRISMA_INSTALLATION_START: `Starting to install Prisma${EMOJIS.COFFEE}`,
+  PRISMA_INSTALLATION_SUCCESS: chalk.green(
+    `Prisma and prisma client haven been successfully installed ${EMOJIS.HEART}`,
+  ),
+  PRISMA_INSTALLATION_FAILURE: `Prisma and prisma client could not be succesfully installed`,
+  PRISMA_SCHEMA_INITIALIZATION: ``,
+  PRISMA_SCHEMA_INITIALIZATION_ERROR: ``,
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,

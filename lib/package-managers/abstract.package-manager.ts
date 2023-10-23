@@ -39,22 +39,38 @@ export abstract class AbstractPackageManager {
         collect,
         join(process.cwd(), normalizedDirectory),
       );
+      var isPrismaInstalled = false;
       // if user has wants prisma, then install prisma and @prisma/client
       if (shouldInitializePrisma) {
-        const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
-        const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
+        try {
+          const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
+          const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
 
-        await this.runner.run(
-          prismaCommandArg,
-          collect,
-          join(process.cwd(), normalizedDirectory),
-        );
+          console.info(MESSAGES.PRISMA_INSTALLATION_START);
 
-        await this.runner.run(
-          prismaClientCommandArg,
-          collect,
-          join(process.cwd(), normalizedDirectory),
-        );
+          await this.runner.run(
+            prismaCommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+
+          await this.runner.run(
+            prismaClientCommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+          isPrismaInstalled = true;
+          console.info(MESSAGES.PRISMA_INSTALLATION_SUCCESS);
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.PRISMA_INSTALLATION_FAILURE));
+        }
+      }
+
+      if (isPrismaInstalled) {
+        try {
+        } catch (error) {
+          console.error(chalk.red());
+        }
       }
 
       spinner.succeed();
