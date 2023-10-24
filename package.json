@@ -1,6 +1,6 @@
 {
-  "name": "@soorajk1/stencil-cli",
-  "version": "0.0.1",
+  "name": "@soorajk1/test-cli",
+  "version": "0.0.2",
   "description": "Stencil for custom nest bootstrap",
   "publishConfig": {
     "access": "public"
@@ -9,14 +9,14 @@
     "node": ">= 16"
   },
   "bin": {
-    "nest": "bin/nest.js"
+    "stencil": "bin/stencil.js"
   },
   "scripts": {
     "build": "tsc",
     "clean": "gulp clean:bundle",
     "format": "prettier --write \"**/*.ts\"",
     "lint": "eslint '{lib,commands,actions}/**/*.ts' --fix",
-    "start": "node bin/nest.js",
+    "start": "node bin/stencil.js",
     "prepack": "npm run build",
     "prepublish:next": "npm run build",
     "publish:latest": "npm publish --access public && npm run clean",
