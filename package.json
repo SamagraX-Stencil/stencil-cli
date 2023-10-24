@@ -1,6 +1,6 @@
 {
   "name": "@soorajk1/stencil-cli",
-  "version": "1.1.20",
+  "version": "0.0.1",
   "description": "Stencil for custom nest bootstrap",
   "publishConfig": {
     "access": "public"
@@ -29,10 +29,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sooraj1002/stencil-cli.git"
+    "url": "git+https://github.com/techsavvyash/stencil-cli.git"
   },
   "license": "MIT",
-  "homepage": "https://github.com/sooraj1002/stencil-cli#readme",
+  "homepage": "https://github.com/techsavvyash/stencil-cli#readme",
   "dependencies": {
     "@angular-devkit/core": "16.2.3",
     "@angular-devkit/schematics": "16.2.3",
