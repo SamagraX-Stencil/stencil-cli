@@ -23,6 +23,7 @@ import { EMOJIS, MESSAGES } from '../lib/ui';
 import { normalizeToKebabOrSnakeCase } from '../lib/utils/formatting';
 import { AbstractAction } from './abstract.action';
 import { ClassPrisma } from '../lib/prisma';
+import { ClassUserService } from '../lib/service-user';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -47,6 +48,10 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'prisma' && option.value === 'yes',
     );
 
+    const shouldInitializeUserService = options.some(
+      (option) => option.name === 'userService' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -58,12 +63,19 @@ export class NewAction extends AbstractAction {
         isDryRunEnabled as boolean,
         projectDirectory,
         shouldInitializePrima as boolean,
+        shouldInitializeUserService as boolean,
       );
 
       await createPrismaFiles(
         isDryRunEnabled as boolean,
         projectDirectory,
         shouldInitializePrima as boolean,
+      );
+
+      await createUserService(
+        isDryRunEnabled as boolean,
+        projectDirectory,
+        shouldInitializeUserService as boolean,
       );
     }
 
@@ -87,6 +99,9 @@ const getPackageManagerInput = (inputs: Input[]) =>
 
 const getPrismaInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'prisma');
+
+const getUserServiceInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'userService');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -115,6 +130,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   const prismaInput = getPrismaInput(options);
   if (!prismaInput!.value) {
     const answers = await askForPrisma();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const userServiceInput = getUserServiceInput(options);
+  if (!userServiceInput!.value) {
+    const answers = await askForUserService();
     replaceInputMissingInformation(options, answers);
   }
 
@@ -167,6 +188,7 @@ const installPackages = async (
   dryRunMode: boolean,
   installDirectory: string,
   shouldInitializePrima: boolean,
+  shouldInitialzeUserService: boolean,
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
 
@@ -184,6 +206,7 @@ const installPackages = async (
       installDirectory,
       inputPackageManager,
       shouldInitializePrima,
+      shouldInitialzeUserService,
     );
   } catch (error) {
     if (error && error.message) {
@@ -214,6 +237,32 @@ const createPrismaFiles = async (
   }
 };
 
+const createUserService = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeUserService: boolean,
+) => {
+  if (!shouldInitializeUserService) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const userServiceInstance = new ClassUserService();
+  try {
+    await userServiceInstance.create(createDirectory);
+  } catch (error) {
+    console.error(
+      'could not update the app.module file with user-service file',
+    );
+  }
+};
+
 const askForPackageManager = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
@@ -228,6 +277,17 @@ const askForPackageManager = async (): Promise<Answers> => {
 const askForPrisma = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('prisma')(MESSAGES.PRISMA_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForUserService = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('userService')(MESSAGES.USER_SERVICE_QUESTION)([
+      'yes',
+      'no',
+    ]),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);

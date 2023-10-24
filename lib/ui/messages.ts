@@ -10,6 +10,12 @@ export const MESSAGES = {
   RUNNER_EXECUTION_ERROR: (command: string) =>
     `\nFailed to execute command: ${command}`,
   PACKAGE_MANAGER_QUESTION: `Which package manager would you ${EMOJIS.HEART}  to use?`,
+  USER_SERVICE_QUESTION: 'Do you want to have User Service Setup',
+  USER_SERVICE_INSTALLATION_ERROR: 'Failed to install the user service package',
+  USER_SERVICE_FILE_INITIALIZATION_START:
+    'Starting initialisation of the user service',
+  USER_SERVICE_FILE_INITIALIZATION_ERROR:
+    'Could not initialise the user service properly',
   PRISMA_QUESTION: 'Do you want to have prisma setup?',
   PRISMA_INITIALIZATION_START: `Starting to install Prisma ${EMOJIS.COFFEE}`,
   PRISMA_INITIALIZATION_IN_PROGRESS: `Prisma initialization in progress... ${EMOJIS.COFFEE}`,

@@ -17,6 +17,7 @@ export abstract class AbstractPackageManager {
     directory: string,
     packageManager: string,
     shouldInitializePrisma?: boolean,
+    shouldInitializeUserService?: boolean,
   ) {
     const spinner = ora({
       spinner: {
@@ -53,12 +54,21 @@ export abstract class AbstractPackageManager {
             collect,
             join(process.cwd(), normalizedDirectory),
           );
-
-          // await this.initializePrisma(normalizedDirectory);
-
-          // await this.initialsePrismaService(normalizedDirectory);
         } catch (error) {
           console.error(chalk.red(MESSAGES.PRISMA_INSTALLATION_FAILURE));
+        }
+      }
+
+      if (shouldInitializeUserService) {
+        try {
+          const CommandArg = `${this.cli.install} @techsavvyash/user-service ${this.cli.silentFlag}`;
+          await this.runner.run(
+            CommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.USER_SERVICE_INSTALLATION_ERROR));
         }
       }
 
