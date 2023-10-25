@@ -4,7 +4,7 @@ import { join } from 'path';
 import { MESSAGES } from '../ui';
 import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
 import { NpxRunner } from '../runners/npx.runner';
-import { NestRunner } from '../runners/nest.runner';
+import { StencilRunner } from '../runners/stencil.runner';
 
 export class ClassPrisma {
   public async create(directory: string) {
@@ -57,13 +57,13 @@ export class ClassPrisma {
   public async initialsePrismaService(
     normalizedDirectory: string,
   ): Promise<void> {
-    const nestRunner = new NestRunner();
+    const stencilRunner = new StencilRunner();
     const prismaServiceInitCommand = 'g service-prisma prisma';
     const commandArgs = `${prismaServiceInitCommand}`;
 
     try {
       console.info(MESSAGES.PRISMA_SERVICE_INITIALIZATION);
-      await nestRunner.run(
+      await stencilRunner.run(
         commandArgs,
         false,
         join(process.cwd(), normalizedDirectory),

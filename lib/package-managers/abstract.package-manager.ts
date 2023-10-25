@@ -8,7 +8,7 @@ import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
 import { PackageManagerCommands } from './package-manager-commands';
 import { ProjectDependency } from './project.dependency';
 import { NpxRunner } from '../runners/npx.runner';
-import { NestRunner } from '../runners/nest.runner';
+import { StencilRunner } from '../runners/stencil.runner';
 
 export abstract class AbstractPackageManager {
   constructor(protected runner: AbstractRunner) {}
@@ -246,13 +246,13 @@ export abstract class AbstractPackageManager {
   public async initialsePrismaService(
     normalizedDirectory: string,
   ): Promise<void> {
-    const nestRunner = new NestRunner();
+    const stencilRunner = new StencilRunner();
     const prismaServiceInitCommand = 'g service-prisma prisma';
     const commandArgs = `${prismaServiceInitCommand}`;
 
     try {
       console.info(MESSAGES.PRISMA_SERVICE_INITIALIZATION);
-      await nestRunner.run(
+      await stencilRunner.run(
         commandArgs,
         false,
         join(process.cwd(), normalizedDirectory),

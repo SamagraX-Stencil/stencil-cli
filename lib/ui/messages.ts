@@ -10,7 +10,17 @@ export const MESSAGES = {
   RUNNER_EXECUTION_ERROR: (command: string) =>
     `\nFailed to execute command: ${command}`,
   PACKAGE_MANAGER_QUESTION: `Which package manager would you ${EMOJIS.HEART}  to use?`,
-  USER_SERVICE_QUESTION: 'Do you want to have User Service Setup',
+  FIXTURES_QUESTION: 'Do you want toi setup fixtures in your project? ',
+  FIXTURES_FILES_INITIALIZATION_START:
+    'Starting the initialisation of the fixtures files',
+  FIXTURES_FILES_INITIALIZATION_ERROR: 'Could not generate the fixtures files',
+  GITHUB_FILES_INITIALIZATION_START:
+    'Starting the initialisation of the fixtures files',
+  GITHUB_FILES_INITIALIZATION_ERROR: 'Could not generate the fixtures files',
+  HUSKY_INITIALISATION_START: 'Starting initialisation of husky base files',
+  HUSKY_INITIALISATION_ERROR:
+    'Error generating the base husky files(husky was not installed properly)',
+  USER_SERVICE_QUESTION: 'Do you want to have User Service Setup ',
   USER_SERVICE_INSTALLATION_ERROR: 'Failed to install the user service package',
   USER_SERVICE_FILE_INITIALIZATION_START:
     'Starting initialisation of the user service',
