@@ -72,6 +72,7 @@ export class NewAction extends AbstractAction {
       );
 
       await createPrismaFiles(
+        options,
         isDryRunEnabled as boolean,
         projectDirectory,
         shouldInitializePrima as boolean,
@@ -235,6 +236,7 @@ const installPackages = async (
 };
 
 const createPrismaFiles = async (
+  options: Input[],
   dryRunMode: boolean,
   createDirectory: string,
   shouldInitializePrima: boolean,
@@ -248,9 +250,12 @@ const createPrismaFiles = async (
     console.info();
     return;
   }
+
+  const inputPackageManager = getPackageManagerInput(options)!.value as string;
   const prismaInstance = new ClassPrisma();
+
   try {
-    await prismaInstance.create(createDirectory);
+    await prismaInstance.create(createDirectory, inputPackageManager);
   } catch (error) {
     console.error('could not generate the prisma files successfully');
   }

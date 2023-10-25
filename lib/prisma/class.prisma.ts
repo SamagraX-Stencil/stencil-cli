@@ -7,7 +7,7 @@ import { NpxRunner } from '../runners/npx.runner';
 import { StencilRunner } from '../runners/stencil.runner';
 
 export class ClassPrisma {
-  public async create(directory: string) {
+  public async create(directory: string, inputPackageManager: string) {
     const spinner = ora({
       spinner: {
         interval: 120,

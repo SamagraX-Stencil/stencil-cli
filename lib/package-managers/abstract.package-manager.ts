@@ -29,6 +29,7 @@ export abstract class AbstractPackageManager {
     spinner.start();
     try {
       const commandArgs = `${this.cli.install} ${this.cli.silentFlag}`;
+      console.info(commandArgs);
 
       const collect = true;
       const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
@@ -40,15 +41,16 @@ export abstract class AbstractPackageManager {
       );
       if (shouldInitializePrisma) {
         try {
-          const prismaCommandArg = `${this.cli.install} prisma ${this.cli.silentFlag}`;
-
+          const prismaCommandArg = `${this.cli.add} prisma ${this.cli.silentFlag}`;
+          console.info(prismaCommandArg);
           await this.runner.run(
             prismaCommandArg,
             collect,
             join(process.cwd(), normalizedDirectory),
           );
 
-          const prismaClientCommandArg = `${this.cli.install} @prisma/client ${this.cli.silentFlag}`;
+          const prismaClientCommandArg = `${this.cli.add} @prisma/client ${this.cli.silentFlag}`;
+          console.info(prismaClientCommandArg);
           await this.runner.run(
             prismaClientCommandArg,
             collect,
@@ -61,7 +63,7 @@ export abstract class AbstractPackageManager {
 
       if (shouldInitializeUserService) {
         try {
-          const CommandArg = `${this.cli.install} @techsavvyash/user-service ${this.cli.silentFlag}`;
+          const CommandArg = `${this.cli.add} @techsavvyash/user-service ${this.cli.silentFlag}`;
           await this.runner.run(
             CommandArg,
             collect,
