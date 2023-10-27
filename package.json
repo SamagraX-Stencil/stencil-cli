@@ -1,6 +1,6 @@
 {
-  "name": "@soorajk1/test-cli",
-  "version": "0.0.15",
+  "name": "@soorajk1/stencil-cli",
+  "version": "0.0.2",
   "description": "Stencil for custom nest bootstrap",
   "publishConfig": {
     "access": "public"
