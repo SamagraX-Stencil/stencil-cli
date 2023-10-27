@@ -83,9 +83,6 @@ export class NewAction extends AbstractAction {
         projectDirectory,
         shouldInitializeUserService as boolean,
       );
-
-      //pass shouldInitializeFixtures if we make this an option in the future
-      await createFixtures(isDryRunEnabled as boolean, projectDirectory, true);
     }
 
     if (!isDryRunEnabled) {
@@ -93,6 +90,9 @@ export class NewAction extends AbstractAction {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
       }
+
+      //pass shouldInitializeFixtures if we make this an option in the future
+      await createFixtures(isDryRunEnabled as boolean, projectDirectory, true);
 
       printCollective();
     }

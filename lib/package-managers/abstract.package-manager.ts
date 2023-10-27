@@ -29,8 +29,6 @@ export abstract class AbstractPackageManager {
     spinner.start();
     try {
       const commandArgs = `${this.cli.install} ${this.cli.silentFlag}`;
-      console.info(commandArgs);
-
       const collect = true;
       const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
 

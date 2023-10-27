@@ -32,6 +32,20 @@ export class ClassPrisma {
       console.error('Failed to initialise the prisma service files');
     }
 
+    try {
+      await this.updatePrismaFiles(normalizedDirectory);
+    } catch (error) {
+      spinner.fail();
+      console.error('Failed to update the prisma schema files');
+    }
+
+    try {
+      await this.generatePrisma(normalizedDirectory);
+    } catch (error) {
+      spinner.fail();
+      console.error('Failed to run the prisma generate command');
+    }
+
     spinner.succeed();
     console.info('Successfully installed and created all prisma related files');
   }
@@ -70,6 +84,40 @@ export class ClassPrisma {
       );
     } catch (error) {
       console.error(chalk.red(MESSAGES.PRISMA_SERVICE_INITIALIZATION_ERROR));
+    }
+  }
+
+  public async updatePrismaFiles(normalizedDirectory: string): Promise<void> {
+    const stencilRunner = new StencilRunner();
+    const prismaUpdateCommand = 'g prisma';
+    const commandArgs = `${prismaUpdateCommand}`;
+
+    try {
+      console.info(MESSAGES.PRISMA_SCHEMA_UPDATE);
+      await stencilRunner.run(
+        commandArgs,
+        false,
+        join(process.cwd(), normalizedDirectory),
+      );
+    } catch (error) {
+      console.error(chalk.red(MESSAGES.PRISMA_SCHEMA_UPDATE_ERROR));
+    }
+  }
+
+  public async generatePrisma(normalizedDirectory: string): Promise<void> {
+    const npxRunner = new NpxRunner();
+    const prismaGenerateCommand = 'prisma generate';
+    const commandArgs = `${prismaGenerateCommand}`;
+
+    try {
+      console.info(MESSAGES.PRISMA_GENERATE_START);
+      await npxRunner.run(
+        commandArgs,
+        false,
+        join(process.cwd(), normalizedDirectory),
+      );
+    } catch (error) {
+      console.error(chalk.red(MESSAGES.PRISMA_GENERATE_ERROR));
     }
   }
 }

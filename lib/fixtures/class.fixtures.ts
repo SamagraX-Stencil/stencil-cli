@@ -22,7 +22,7 @@ export class ClassFixtures {
     }
 
     try {
-      await this.initializeFixtureFiles(normalizedDirectory);
+      await this.initializeGithubFiles(normalizedDirectory);
     } catch (error) {
       console.error('Failed to generate the fixture files');
     }

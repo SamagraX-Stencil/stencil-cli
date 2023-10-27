@@ -15,8 +15,8 @@ export const MESSAGES = {
     'Starting the initialisation of the fixtures files',
   FIXTURES_FILES_INITIALIZATION_ERROR: 'Could not generate the fixtures files',
   GITHUB_FILES_INITIALIZATION_START:
-    'Starting the initialisation of the fixtures files',
-  GITHUB_FILES_INITIALIZATION_ERROR: 'Could not generate the fixtures files',
+    'Starting the initialisation of the github files',
+  GITHUB_FILES_INITIALIZATION_ERROR: 'Could not generate the github files',
   HUSKY_INITIALISATION_START: 'Starting initialisation of husky base files',
   HUSKY_INITIALISATION_ERROR:
     'Error generating the base husky files(husky was not installed properly)',
@@ -37,6 +37,10 @@ export const MESSAGES = {
   PRISMA_SCHEMA_INITIALIZATION: `Starting the prisma schema initialization`,
   PRISMA_SCHEMA_INITIALIZATION_ERROR: `Failed to run the npx prisma init command`,
   PRISMA_SERVICE_INITIALIZATION: `Generating the prisma service files`,
+  PRISMA_SCHEMA_UPDATE: 'starting to add model',
+  PRISMA_SCHEMA_UPDATE_ERROR: 'could not add models',
+  PRISMA_GENERATE_START: 'starting to run the generate command',
+  PRISMA_GENERATE_ERROR: 'failed to run the generate command',
   PRISMA_SERVICE_INITIALIZATION_ERROR: `Failed to generate the prisma service files`,
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
