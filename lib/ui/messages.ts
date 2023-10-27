@@ -10,6 +10,24 @@ export const MESSAGES = {
   RUNNER_EXECUTION_ERROR: (command: string) =>
     `\nFailed to execute command: ${command}`,
   PACKAGE_MANAGER_QUESTION: `Which package manager would you ${EMOJIS.HEART}  to use?`,
+  USER_SERVICE_QUESTION: 'Do you want to have User Service Setup',
+  USER_SERVICE_INSTALLATION_ERROR: 'Failed to install the user service package',
+  USER_SERVICE_FILE_INITIALIZATION_START:
+    'Starting initialisation of the user service',
+  USER_SERVICE_FILE_INITIALIZATION_ERROR:
+    'Could not initialise the user service properly',
+  PRISMA_QUESTION: 'Do you want to have prisma setup?',
+  PRISMA_INITIALIZATION_START: `Starting to install Prisma ${EMOJIS.COFFEE}`,
+  PRISMA_INITIALIZATION_IN_PROGRESS: `Prisma initialization in progress... ${EMOJIS.COFFEE}`,
+  PRISMA_INSTALLATION_START: `Starting to install Prisma ${EMOJIS.COFFEE}`,
+  PRISMA_INSTALLATION_SUCCESS: chalk.green(
+    `Prisma and prisma client haven been successfully installed ${EMOJIS.HEART}`,
+  ),
+  PRISMA_INSTALLATION_FAILURE: `Prisma and prisma client could not be succesfully installed`,
+  PRISMA_SCHEMA_INITIALIZATION: `Starting the prisma schema initialization`,
+  PRISMA_SCHEMA_INITIALIZATION_ERROR: `Failed to run the npx prisma init command`,
+  PRISMA_SERVICE_INITIALIZATION: `Generating the prisma service files`,
+  PRISMA_SERVICE_INITIALIZATION_ERROR: `Failed to generate the prisma service files`,
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,

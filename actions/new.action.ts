@@ -22,6 +22,8 @@ import {
 import { EMOJIS, MESSAGES } from '../lib/ui';
 import { normalizeToKebabOrSnakeCase } from '../lib/utils/formatting';
 import { AbstractAction } from './abstract.action';
+import { ClassPrisma } from '../lib/prisma';
+import { ClassUserService } from '../lib/service-user';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -37,9 +39,19 @@ export class NewAction extends AbstractAction {
     const shouldSkipInstall = options.some(
       (option) => option.name === 'skip-install' && option.value === true,
     );
+
     const shouldSkipGit = options.some(
       (option) => option.name === 'skip-git' && option.value === true,
     );
+
+    const shouldInitializePrima = options.some(
+      (option) => option.name === 'prisma' && option.value === 'yes',
+    );
+
+    const shouldInitializeUserService = options.some(
+      (option) => option.name === 'userService' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -50,8 +62,23 @@ export class NewAction extends AbstractAction {
         options,
         isDryRunEnabled as boolean,
         projectDirectory,
+        shouldInitializePrima as boolean,
+        shouldInitializeUserService as boolean,
+      );
+
+      await createPrismaFiles(
+        isDryRunEnabled as boolean,
+        projectDirectory,
+        shouldInitializePrima as boolean,
+      );
+
+      await createUserService(
+        isDryRunEnabled as boolean,
+        projectDirectory,
+        shouldInitializeUserService as boolean,
       );
     }
+
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
@@ -69,6 +96,12 @@ const getApplicationNameInput = (inputs: Input[]) =>
 
 const getPackageManagerInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'packageManager');
+
+const getPrismaInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'prisma');
+
+const getUserServiceInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'userService');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -92,6 +125,18 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     const questions = [generateInput('name', message)('nest-app')];
     const answers: Answers = await prompt(questions as ReadonlyArray<Question>);
     replaceInputMissingInformation(inputs, answers);
+  }
+
+  const prismaInput = getPrismaInput(options);
+  if (!prismaInput!.value) {
+    const answers = await askForPrisma();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const userServiceInput = getUserServiceInput(options);
+  if (!userServiceInput!.value) {
+    const answers = await askForUserService();
+    replaceInputMissingInformation(options, answers);
   }
 
   const packageManagerInput = getPackageManagerInput(options);
@@ -142,6 +187,8 @@ const installPackages = async (
   options: Input[],
   dryRunMode: boolean,
   installDirectory: string,
+  shouldInitializePrima: boolean,
+  shouldInitialzeUserService: boolean,
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
 
@@ -152,13 +199,67 @@ const installPackages = async (
     console.info();
     return;
   }
+
   try {
     packageManager = PackageManagerFactory.create(inputPackageManager);
-    await packageManager.install(installDirectory, inputPackageManager);
+    await packageManager.install(
+      installDirectory,
+      inputPackageManager,
+      shouldInitializePrima,
+      shouldInitialzeUserService,
+    );
   } catch (error) {
     if (error && error.message) {
       console.error(chalk.red(error.message));
     }
+  }
+};
+
+const createPrismaFiles = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializePrima: boolean,
+) => {
+  if (!shouldInitializePrima) {
+    return;
+  }
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+  const prismaInstance = new ClassPrisma();
+  try {
+    await prismaInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not generate the prisma files successfully');
+  }
+};
+
+const createUserService = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeUserService: boolean,
+) => {
+  if (!shouldInitializeUserService) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const userServiceInstance = new ClassUserService();
+  try {
+    await userServiceInstance.create(createDirectory);
+  } catch (error) {
+    console.error(
+      'could not update the app.module file with user-service file',
+    );
   }
 };
 
@@ -168,6 +269,25 @@ const askForPackageManager = async (): Promise<Answers> => {
       PackageManager.NPM,
       PackageManager.YARN,
       PackageManager.PNPM,
+    ]),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForPrisma = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('prisma')(MESSAGES.PRISMA_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForUserService = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('userService')(MESSAGES.USER_SERVICE_QUESTION)([
+      'yes',
+      'no',
     ]),
   ];
   const prompt = inquirer.createPromptModule();
