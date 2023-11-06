@@ -27,6 +27,12 @@ export class ClassFixtures {
       console.error('Failed to generate the fixture files');
     }
 
+    try {
+      await this.initializeDevcontainerFiles(normalizedDirectory);
+    } catch (error) {
+      console.error('Failed to generate the Devcontainer files');
+    }
+
     console.info('Successfully completed file generation in fixtures');
   }
 
@@ -78,6 +84,27 @@ export class ClassFixtures {
       );
     } catch (error) {
       console.error(chalk.red(MESSAGES.FIXTURES_FILES_INITIALIZATION_ERROR));
+    }
+  }
+
+  public async initializeDevcontainerFiles(
+    normalizedDirectory: string,
+  ): Promise<void> {
+    console.info(chalk.grey(MESSAGES.DEVCONATINER_FILES_INITIALIZATION_START));
+    const stencilRunner = new StencilRunner();
+    const userServiceCommand = 'g devcontainer';
+    const commandArgs = `${userServiceCommand}`;
+
+    try {
+      await stencilRunner.run(
+        commandArgs,
+        false,
+        join(process.cwd(), normalizedDirectory),
+      );
+    } catch (error) {
+      console.error(
+        chalk.red(MESSAGES.DEVCONATINER_FILES_INITIALIZATION_ERROR),
+      );
     }
   }
 
