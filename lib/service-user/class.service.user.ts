@@ -3,7 +3,7 @@ import * as ora from 'ora';
 import { join } from 'path';
 import { MESSAGES } from '../ui';
 import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
-import { NestRunner } from '../runners/nest.runner';
+import { StencilRunner } from '../runners/stencil.runner';
 
 export class ClassUserService {
   public async create(directory: string) {
@@ -29,12 +29,12 @@ export class ClassUserService {
   }
 
   public async initializeUserFiles(normalizedDirectory: string): Promise<void> {
-    const nestRunner = new NestRunner();
+    const stencilRunner = new StencilRunner();
     const userServiceCommand = 'g service-user';
     const commandArgs = `${userServiceCommand}`;
 
     try {
-      await nestRunner.run(
+      await stencilRunner.run(
         commandArgs,
         false,
         join(process.cwd(), normalizedDirectory),

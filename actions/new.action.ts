@@ -24,6 +24,7 @@ import { normalizeToKebabOrSnakeCase } from '../lib/utils/formatting';
 import { AbstractAction } from './abstract.action';
 import { ClassPrisma } from '../lib/prisma';
 import { ClassUserService } from '../lib/service-user';
+import { ClassFixtures } from '../lib/fixtures';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -52,6 +53,10 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'userService' && option.value === 'yes',
     );
 
+    const shouldInitializeFixtures = options.some(
+      (option) => option.name === 'fixtures' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -67,6 +72,7 @@ export class NewAction extends AbstractAction {
       );
 
       await createPrismaFiles(
+        options,
         isDryRunEnabled as boolean,
         projectDirectory,
         shouldInitializePrima as boolean,
@@ -85,6 +91,9 @@ export class NewAction extends AbstractAction {
         await createGitIgnoreFile(projectDirectory);
       }
 
+      //pass shouldInitializeFixtures if we make this an option in the future
+      await createFixtures(isDryRunEnabled as boolean, projectDirectory, true);
+
       printCollective();
     }
     process.exit(0);
@@ -102,6 +111,9 @@ const getPrismaInput = (inputs: Input[]) =>
 
 const getUserServiceInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'userService');
+
+const getFixturesInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'fixtures');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -144,6 +156,14 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     const answers = await askForPackageManager();
     replaceInputMissingInformation(options, answers);
   }
+
+  //UNCOMMENT THE FOLLOWING FUNCTION IF WE WANT TO MAKE THIS AN OPTION IN THE FUTURE
+
+  // const fixturesInput = getFixturesInput(options);
+  // if (!fixturesInput!.value) {
+  //   const answers = await askForFixtures();
+  //   replaceInputMissingInformation(options, answers);
+  // }
 };
 
 const replaceInputMissingInformation = (
@@ -216,6 +236,7 @@ const installPackages = async (
 };
 
 const createPrismaFiles = async (
+  options: Input[],
   dryRunMode: boolean,
   createDirectory: string,
   shouldInitializePrima: boolean,
@@ -229,9 +250,12 @@ const createPrismaFiles = async (
     console.info();
     return;
   }
+
+  const inputPackageManager = getPackageManagerInput(options)!.value as string;
   const prismaInstance = new ClassPrisma();
+
   try {
-    await prismaInstance.create(createDirectory);
+    await prismaInstance.create(createDirectory, inputPackageManager);
   } catch (error) {
     console.error('could not generate the prisma files successfully');
   }
@@ -263,6 +287,34 @@ const createUserService = async (
   }
 };
 
+const createFixtures = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeFixtures: boolean,
+) => {
+  if (!shouldInitializeFixtures) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  //THIS WILL CREATE THE FILES STEP BY STEP, FIRST IT WILL CREATE THE HUSKY FILES
+  //THEN IT WILL CREATE THE .sh AND DOCKER RELATED FILES
+  //THEN IT WILL CREATE THE .github FILE
+
+  const fixturesInstance = new ClassFixtures();
+  try {
+    await fixturesInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could create the necessary files for user fixtures');
+  }
+};
+
 const askForPackageManager = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
@@ -289,6 +341,14 @@ const askForUserService = async (): Promise<Answers> => {
       'yes',
       'no',
     ]),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForFixtures = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('fixtures')(MESSAGES.FIXTURES_QUESTION)(['yes', 'no']),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);

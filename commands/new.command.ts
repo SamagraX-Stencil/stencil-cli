@@ -40,6 +40,10 @@ export class NewCommand extends AbstractCommand {
         '-us, --user-service [userService]',
         'If you user service setup in the project',
       )
+      .option(
+        '-fs, --fixtures [fixtures]',
+        'If you want to have fixtures in the code',
+      )
       .action(async (name: string, command: Command) => {
         const options: Input[] = [];
         const availableLanguages = ['js', 'ts', 'javascript', 'typescript'];
@@ -55,6 +59,7 @@ export class NewCommand extends AbstractCommand {
         options.push({ name: 'collection', value: command.collection });
         options.push({ name: 'prisma', value: command.prisma });
         options.push({ name: 'userService', value: command.userService });
+        options.push({ name: 'fixtures', value: command.fixtures });
 
         if (!!command.language) {
           const lowercasedLanguage = command.language.toLowerCase();
