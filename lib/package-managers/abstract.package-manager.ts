@@ -40,7 +40,6 @@ export abstract class AbstractPackageManager {
       if (shouldInitializePrisma) {
         try {
           const prismaCommandArg = `${this.cli.add} prisma ${this.cli.silentFlag}`;
-          console.info(prismaCommandArg);
           await this.runner.run(
             prismaCommandArg,
             collect,
@@ -48,7 +47,6 @@ export abstract class AbstractPackageManager {
           );
 
           const prismaClientCommandArg = `${this.cli.add} @prisma/client ${this.cli.silentFlag}`;
-          console.info(prismaClientCommandArg);
           await this.runner.run(
             prismaClientCommandArg,
             collect,

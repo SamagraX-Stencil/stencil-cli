@@ -8,45 +8,31 @@ import { StencilRunner } from '../runners/stencil.runner';
 
 export class ClassPrisma {
   public async create(directory: string, inputPackageManager: string) {
-    const spinner = ora({
-      spinner: {
-        interval: 120,
-        frames: ['▹▹▹▹▹', '▸▹▹▹▹', '▹▸▹▹▹', '▹▹▸▹▹', '▹▹▹▸▹', '▹▹▹▹▸'],
-      },
-      text: MESSAGES.PRISMA_INSTALLATION_START,
-    });
-    spinner.start();
     const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
 
     try {
       await this.initializePrisma(normalizedDirectory);
     } catch (error) {
-      spinner.fail();
       console.error('Failed to run prisma init command');
     }
 
     try {
       await this.initialsePrismaService(normalizedDirectory);
     } catch (error) {
-      spinner.fail();
       console.error('Failed to initialise the prisma service files');
     }
 
     try {
       await this.updatePrismaFiles(normalizedDirectory);
     } catch (error) {
-      spinner.fail();
       console.error('Failed to update the prisma schema files');
     }
 
     try {
       await this.generatePrisma(normalizedDirectory);
     } catch (error) {
-      spinner.fail();
       console.error('Failed to run the prisma generate command');
     }
-
-    spinner.succeed();
     console.info('Successfully installed and created all prisma related files');
   }
 

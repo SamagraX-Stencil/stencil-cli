@@ -14,6 +14,10 @@ export const MESSAGES = {
   FIXTURES_FILES_INITIALIZATION_START:
     'Starting the initialisation of the fixtures files',
   FIXTURES_FILES_INITIALIZATION_ERROR: 'Could not generate the fixtures files',
+  DEVCONATINER_FILES_INITIALIZATION_START:
+    'Starting the initialisation of the devcontainer files',
+  DEVCONATINER_FILES_INITIALIZATION_ERROR:
+    'Could not generate the devcontainer files',
   GITHUB_FILES_INITIALIZATION_START:
     'Starting the initialisation of the github files',
   GITHUB_FILES_INITIALIZATION_ERROR: 'Could not generate the github files',
@@ -27,12 +31,6 @@ export const MESSAGES = {
   USER_SERVICE_FILE_INITIALIZATION_ERROR:
     'Could not initialise the user service properly',
   PRISMA_QUESTION: 'Do you want to have prisma setup?',
-  PRISMA_INITIALIZATION_START: `Starting to install Prisma ${EMOJIS.COFFEE}`,
-  PRISMA_INITIALIZATION_IN_PROGRESS: `Prisma initialization in progress... ${EMOJIS.COFFEE}`,
-  PRISMA_INSTALLATION_START: `Starting to install Prisma ${EMOJIS.COFFEE}`,
-  PRISMA_INSTALLATION_SUCCESS: chalk.green(
-    `Prisma and prisma client haven been successfully installed ${EMOJIS.HEART}`,
-  ),
   PRISMA_INSTALLATION_FAILURE: `Prisma and prisma client could not be succesfully installed`,
   PRISMA_SCHEMA_INITIALIZATION: `Starting the prisma schema initialization`,
   PRISMA_SCHEMA_INITIALIZATION_ERROR: `Failed to run the npx prisma init command`,

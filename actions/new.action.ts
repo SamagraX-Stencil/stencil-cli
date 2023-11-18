@@ -306,6 +306,7 @@ const createFixtures = async (
   //THIS WILL CREATE THE FILES STEP BY STEP, FIRST IT WILL CREATE THE HUSKY FILES
   //THEN IT WILL CREATE THE .sh AND DOCKER RELATED FILES
   //THEN IT WILL CREATE THE .github FILE
+  //THEN IT WILL CREATE THE .devcontainer FILE
 
   const fixturesInstance = new ClassFixtures();
   try {
