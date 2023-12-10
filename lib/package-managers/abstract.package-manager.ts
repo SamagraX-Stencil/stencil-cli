@@ -80,7 +80,18 @@ export abstract class AbstractPackageManager {
             join(process.cwd(), normalizedDirectory),
           );
         } catch (error) {
-          console.error(chalk.red(MESSAGES.USER_SERVICE_INSTALLATION_ERROR));
+          console.error(chalk.red(MESSAGES.MONITORING_INSTALL_ERROR));
+        }
+
+        try {
+          const CommandArg = `${this.cli.add} @willsoto/nestjs-prometheus ${this.cli.silentFlag}`;
+          await this.runner.run(
+            CommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.MONITORING_INSTALL_ERROR));
         }
       }
 
