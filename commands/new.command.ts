@@ -49,7 +49,7 @@ export class NewCommand extends AbstractCommand {
         'If you want to have monitoring setup in the project',
       )
       .option(
-        '-ms, --monitoring-service [monitoringService]',
+        '-ms, --monitoringService [monitoringService]',
         'If you want to have monitoring-service setup in the project',
       )
       .action(async (name: string, command: Command) => {
@@ -70,7 +70,7 @@ export class NewCommand extends AbstractCommand {
         options.push({ name: 'fixtures', value: command.fixtures });
         options.push({ name: 'monitoring', value: command.monitoring });
         options.push({
-          name: 'monitoring-service',
+          name: 'monitoringService',
           value: command.monitoringService,
         });
 

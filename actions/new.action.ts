@@ -167,12 +167,6 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     replaceInputMissingInformation(options, answers);
   }
 
-  const packageManagerInput = getPackageManagerInput(options);
-  if (!packageManagerInput!.value) {
-    const answers = await askForPackageManager();
-    replaceInputMissingInformation(options, answers);
-  }
-
   //UNCOMMENT THE FOLLOWING FUNCTION IF WE WANT TO MAKE THIS AN OPTION IN THE FUTURE
 
   // const fixturesInput = getFixturesInput(options);
@@ -190,6 +184,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   const monitoringServiceInput = getMonitoringServiceInput(options);
   if (!monitoringServiceInput!.value) {
     const answers = await askForMonitoringService();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const packageManagerInput = getPackageManagerInput(options);
+  if (!packageManagerInput!.value) {
+    const answers = await askForPackageManager();
     replaceInputMissingInformation(options, answers);
   }
 };
