@@ -24,7 +24,7 @@ export class ClassFixtures {
     try {
       await this.initializeGithubFiles(normalizedDirectory);
     } catch (error) {
-      console.error('Failed to generate the fixture files');
+      console.error('Failed to generate the .github file');
     }
 
     try {

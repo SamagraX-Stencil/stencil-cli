@@ -18,6 +18,7 @@ export abstract class AbstractPackageManager {
     packageManager: string,
     shouldInitializePrisma?: boolean,
     shouldInitializeUserService?: boolean,
+    shouldInstallMonitoring?: boolean,
   ) {
     const spinner = ora({
       spinner: {
@@ -60,6 +61,19 @@ export abstract class AbstractPackageManager {
       if (shouldInitializeUserService) {
         try {
           const CommandArg = `${this.cli.add} @techsavvyash/user-service ${this.cli.silentFlag}`;
+          await this.runner.run(
+            CommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.USER_SERVICE_INSTALLATION_ERROR));
+        }
+      }
+
+      if (shouldInstallMonitoring) {
+        try {
+          const CommandArg = `${this.cli.add} @techsavvyash/nestjs-monitor ${this.cli.silentFlag}`;
           await this.runner.run(
             CommandArg,
             collect,

@@ -4,7 +4,7 @@ import { Configuration } from './configuration';
 export const defaultConfiguration: Required<Configuration> = {
   language: 'ts',
   sourceRoot: 'src',
-  collection: '@soorajk1/schematics',
+  collection: '@soorajk1/new-schematics-test',
   entryFile: 'main',
   exec: 'node',
   projects: {},

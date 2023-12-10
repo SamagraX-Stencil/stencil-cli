@@ -118,7 +118,7 @@ export class NestCollection extends AbstractCollection {
   ];
 
   constructor(runner: AbstractRunner) {
-    super('@soorajk1/schematics', runner);
+    super('@soorajk1/new-schematics-test', runner);
   }
 
   public async execute(name: string, options: SchematicOption[]) {

@@ -25,6 +25,7 @@ import { AbstractAction } from './abstract.action';
 import { ClassPrisma } from '../lib/prisma';
 import { ClassUserService } from '../lib/service-user';
 import { ClassFixtures } from '../lib/fixtures';
+import { ClassMonitoring } from '../lib/monitoring';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -57,6 +58,14 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'fixtures' && option.value === 'yes',
     );
 
+    const shouldInstallMonitoring = options.some(
+      (option) => option.name === 'monitoring' && option.value === 'yes',
+    );
+
+    const shouldInitializeMonitoring = options.some(
+      (option) => option.name === 'monitoringService' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -69,6 +78,7 @@ export class NewAction extends AbstractAction {
         projectDirectory,
         shouldInitializePrima as boolean,
         shouldInitializeUserService as boolean,
+        shouldInstallMonitoring as boolean,
       );
 
       await createPrismaFiles(
@@ -114,6 +124,12 @@ const getUserServiceInput = (inputs: Input[]) =>
 
 const getFixturesInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'fixtures');
+
+const getMonitoringInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'monitoring');
+
+const getMonitoringServiceInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'monitoringService');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -164,6 +180,18 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   //   const answers = await askForFixtures();
   //   replaceInputMissingInformation(options, answers);
   // }
+
+  const monitoringInput = getMonitoringInput(options);
+  if (!monitoringInput!.value) {
+    const answers = await askForMonitoring();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const monitoringServiceInput = getMonitoringServiceInput(options);
+  if (!monitoringServiceInput!.value) {
+    const answers = await askForMonitoringService();
+    replaceInputMissingInformation(options, answers);
+  }
 };
 
 const replaceInputMissingInformation = (
@@ -209,6 +237,7 @@ const installPackages = async (
   installDirectory: string,
   shouldInitializePrima: boolean,
   shouldInitialzeUserService: boolean,
+  shouldInstallMonitoring: boolean,
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
 
@@ -227,6 +256,7 @@ const installPackages = async (
       inputPackageManager,
       shouldInitializePrima,
       shouldInitialzeUserService,
+      shouldInstallMonitoring,
     );
   } catch (error) {
     if (error && error.message) {
@@ -316,6 +346,30 @@ const createFixtures = async (
   }
 };
 
+const installMonitoring = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInstallMonitoring: boolean,
+) => {
+  if (!shouldInstallMonitoring) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const MonitoringInstance = new ClassMonitoring();
+  try {
+    await MonitoringInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not modify the app.module with monitoring');
+  }
+};
+
 const askForPackageManager = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
@@ -350,6 +404,25 @@ const askForUserService = async (): Promise<Answers> => {
 const askForFixtures = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('fixtures')(MESSAGES.FIXTURES_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForMonitoring = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('monitoring')(MESSAGES.MONITORING_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForMonitoringService = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('monitoringService')(MESSAGES.MONITORING_SERVICE_QUESTION)([
+      'yes',
+      'no',
+    ]),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
