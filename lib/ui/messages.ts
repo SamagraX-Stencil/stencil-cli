@@ -45,6 +45,8 @@ export const MESSAGES = {
   MONITORING_INSTALL_ERROR: "Couldn't add monitoring to app.module.ts",
   MONITORING_SERVICE_QUESTION:
     'Do you want to setup monitoring services in this project ?',
+  MONITOR_GENERATION_START: 'Starting the generation of the monitor folder',
+  MONITOR_GENERATION_ERROR: 'Could not generate the monitor folder',
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,

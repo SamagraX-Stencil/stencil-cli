@@ -115,10 +115,55 @@ export class NestCollection extends AbstractCollection {
       alias: 'sp',
       description: 'Generate the Prisma service file',
     },
+    {
+      name: 'service-prisma',
+      alias: 'sp',
+      description: 'Generate the Prisma service file',
+    },
+    {
+      name: 'service-user',
+      alias: 'su',
+      description: 'Add the User Service module from the package.',
+    },
+    {
+      name: 'fixtures',
+      alias: 'fs',
+      description: 'Generate Custom Fixtures Files.',
+    },
+    {
+      name: 'husky',
+      alias: 'hs',
+      description: 'Generate Custom husky Files.',
+    },
+    {
+      name: 'github',
+      alias: 'gh',
+      description: 'Generate Custom github Files.',
+    },
+    {
+      name: 'prisma',
+      alias: 'ps',
+      description: 'Add custom prisma models to the schema.prisma file.',
+    },
+    {
+      name: 'devcontainer',
+      alias: 'dc',
+      description: 'Generate files in a .devcontainer file.',
+    },
+    {
+      name: 'monitorModule',
+      alias: 'mm',
+      description: 'add monitor related imports to the app.module.ts file ',
+    },
+    {
+      name: 'monitor',
+      alias: 'mf',
+      description: 'Generate monitor folder.',
+    },
   ];
 
   constructor(runner: AbstractRunner) {
-    super('@soorajk1/test-schematics', runner);
+    super('@samagra-x/schematics', runner);
   }
 
   public async execute(name: string, options: SchematicOption[]) {

@@ -95,6 +95,19 @@ export class NewAction extends AbstractAction {
       );
     }
 
+    await installMonitoring(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInstallMonitoring as boolean,
+    );
+
+    await createMonitor(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInstallMonitoring as boolean,
+      shouldInitializeMonitoring as boolean,
+    );
+
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
@@ -364,9 +377,34 @@ const installMonitoring = async (
 
   const MonitoringInstance = new ClassMonitoring();
   try {
-    await MonitoringInstance.create(createDirectory);
+    await MonitoringInstance.addImport(createDirectory);
   } catch (error) {
     console.error('could not modify the app.module with monitoring');
+  }
+};
+
+const createMonitor = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInstallMonitoring: boolean,
+  shouldInitializeMonitoring: boolean,
+) => {
+  if (!shouldInstallMonitoring || !shouldInitializeMonitoring) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const MonitoringInstance = new ClassMonitoring();
+  try {
+    await MonitoringInstance.createFiles(createDirectory);
+  } catch (error) {
+    console.error('could not generate the monitor files');
   }
 };
 
