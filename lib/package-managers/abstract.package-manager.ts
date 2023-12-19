@@ -18,6 +18,7 @@ export abstract class AbstractPackageManager {
     packageManager: string,
     shouldInitializePrisma?: boolean,
     shouldInitializeUserService?: boolean,
+    shouldInstallMonitoring?: boolean,
   ) {
     const spinner = ora({
       spinner: {
@@ -45,7 +46,6 @@ export abstract class AbstractPackageManager {
             collect,
             join(process.cwd(), normalizedDirectory),
           );
-
           const prismaClientCommandArg = `${this.cli.add} @prisma/client ${this.cli.silentFlag}`;
           await this.runner.run(
             prismaClientCommandArg,
@@ -67,6 +67,30 @@ export abstract class AbstractPackageManager {
           );
         } catch (error) {
           console.error(chalk.red(MESSAGES.USER_SERVICE_INSTALLATION_ERROR));
+        }
+      }
+
+      if (shouldInstallMonitoring) {
+        try {
+          const CommandArg = `${this.cli.add} @techsavvyash/nestjs-monitor ${this.cli.silentFlag}`;
+          await this.runner.run(
+            CommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.MONITORING_INSTALL_ERROR));
+        }
+
+        try {
+          const CommandArg = `${this.cli.add} @willsoto/nestjs-prometheus ${this.cli.silentFlag}`;
+          await this.runner.run(
+            CommandArg,
+            collect,
+            join(process.cwd(), normalizedDirectory),
+          );
+        } catch (error) {
+          console.error(chalk.red(MESSAGES.MONITORING_INSTALL_ERROR));
         }
       }
 
@@ -221,43 +245,6 @@ export abstract class AbstractPackageManager {
   public async delete(commandArguments: string) {
     const collect = true;
     await this.runner.run(commandArguments, collect);
-  }
-
-  public async initializePrisma(normalizedDirectory: string): Promise<void> {
-    const npxRunner = new NpxRunner();
-    const prismaInitCommand = 'prisma init';
-    const commandArgs = `${prismaInitCommand}`;
-
-    try {
-      console.info(MESSAGES.PRISMA_SCHEMA_INITIALIZATION);
-
-      await npxRunner.run(
-        commandArgs,
-        false,
-        join(process.cwd(), normalizedDirectory),
-      );
-    } catch (error) {
-      console.error(chalk.red(MESSAGES.PRISMA_SCHEMA_INITIALIZATION_ERROR));
-    }
-  }
-
-  public async initialsePrismaService(
-    normalizedDirectory: string,
-  ): Promise<void> {
-    const stencilRunner = new StencilRunner();
-    const prismaServiceInitCommand = 'g service-prisma prisma';
-    const commandArgs = `${prismaServiceInitCommand}`;
-
-    try {
-      console.info(MESSAGES.PRISMA_SERVICE_INITIALIZATION);
-      await stencilRunner.run(
-        commandArgs,
-        false,
-        join(process.cwd(), normalizedDirectory),
-      );
-    } catch (error) {
-      console.error(chalk.red(MESSAGES.PRISMA_SERVICE_INITIALIZATION_ERROR));
-    }
   }
 
   public abstract get name(): string;

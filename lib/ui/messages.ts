@@ -40,6 +40,13 @@ export const MESSAGES = {
   PRISMA_GENERATE_START: 'starting to run the generate command',
   PRISMA_GENERATE_ERROR: 'failed to run the generate command',
   PRISMA_SERVICE_INITIALIZATION_ERROR: `Failed to generate the prisma service files`,
+  MONITORING_QUESTION: 'Do you want to add monitoring to this project ?',
+  MONITORING_INSTALL_START: 'Starting to add monitoring to app.module.ts',
+  MONITORING_INSTALL_ERROR: "Couldn't add monitoring to app.module.ts",
+  MONITORING_SERVICE_QUESTION:
+    'Do you want to setup monitoring services in this project ?',
+  MONITOR_GENERATION_START: 'Starting the generation of the monitor folder',
+  MONITOR_GENERATION_ERROR: 'Could not generate the monitor folder',
   PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPDATE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
   PACKAGE_MANAGER_UPGRADE_IN_PROGRESS: `Installation in progress... ${EMOJIS.COFFEE}`,
