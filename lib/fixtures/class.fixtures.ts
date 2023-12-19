@@ -33,6 +33,12 @@ export class ClassFixtures {
       console.error('Failed to generate the Devcontainer files');
     }
 
+    try {
+      await this.initializeDevcontainerFiles(normalizedDirectory);
+    } catch (error) {
+      console.error('Failed to generate the Devcontainer files');
+    }
+
     console.info('Successfully completed file generation in fixtures');
   }
 
