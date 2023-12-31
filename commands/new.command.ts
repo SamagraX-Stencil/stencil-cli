@@ -52,6 +52,21 @@ export class NewCommand extends AbstractCommand {
         '-ms, --monitoringService [monitoringService]',
         'If you want to have monitoring-service setup in the project',
       )
+      .option(
+        '-te',
+        '--temporal [temporal]',
+        'If you want to have temporal setup in the project',
+      )
+      .option(
+        '-lg',
+        '--logging [logging]',
+        'If you want to have logging setup in the project',
+      )
+      .option(
+        'fu',
+        '--fileUpload [fileUpload]',
+        'If you want to have fileUpload setup in the project',
+      )
       .action(async (name: string, command: Command) => {
         const options: Input[] = [];
         const availableLanguages = ['js', 'ts', 'javascript', 'typescript'];
@@ -73,6 +88,9 @@ export class NewCommand extends AbstractCommand {
           name: 'monitoringService',
           value: command.monitoringService,
         });
+        options.push({ name: 'temporal', value: command.temporal });
+        options.push({ name: 'logging', value: command.logging });
+        options.push({ name: 'fileUpload', value: command.fileUpload });
 
         if (!!command.language) {
           const lowercasedLanguage = command.language.toLowerCase();
