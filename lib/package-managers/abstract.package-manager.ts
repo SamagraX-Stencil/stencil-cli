@@ -18,7 +18,7 @@ export abstract class AbstractPackageManager {
     packageManager: string,
     shouldInitializePrisma?: boolean,
     shouldInitializeUserService?: boolean,
-    shouldInstallMonitoring?: boolean,
+    shouldInitializeTemporal?: boolean,
   ) {
     const spinner = ora({
       spinner: {
@@ -70,20 +70,9 @@ export abstract class AbstractPackageManager {
         }
       }
 
-      if (shouldInstallMonitoring) {
+      if (shouldInitializeTemporal) {
         try {
-          const CommandArg = `${this.cli.add} @techsavvyash/nestjs-monitor ${this.cli.silentFlag}`;
-          await this.runner.run(
-            CommandArg,
-            collect,
-            join(process.cwd(), normalizedDirectory),
-          );
-        } catch (error) {
-          console.error(chalk.red(MESSAGES.MONITORING_INSTALL_ERROR));
-        }
-
-        try {
-          const CommandArg = `${this.cli.add} @willsoto/nestjs-prometheus ${this.cli.silentFlag}`;
+          const CommandArg = `${this.cli.add} nestjs-temporal ${this.cli.silentFlag}`;
           await this.runner.run(
             CommandArg,
             collect,

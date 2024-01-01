@@ -160,6 +160,21 @@ export class NestCollection extends AbstractCollection {
       alias: 'mf',
       description: 'Generate monitor folder.',
     },
+    {
+      name: 'service-temporal',
+      alias: 'te',
+      description: 'If you want to have temporal setup in the project.',
+    },
+    {
+      name: 'logging',
+      alias: 'lg',
+      description: 'If you want to have logging setup in the project.',
+    },
+    {
+      name: 'service-file-upload',
+      alias: 'fu',
+      description: 'If you want to have fileUpload setup in the project.',
+    },
   ];
 
   constructor(runner: AbstractRunner) {
