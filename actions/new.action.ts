@@ -26,6 +26,9 @@ import { ClassPrisma } from '../lib/prisma';
 import { ClassUserService } from '../lib/service-user';
 import { ClassFixtures } from '../lib/fixtures';
 import { ClassMonitoring } from '../lib/monitoring';
+import { ClassTemporal } from '../lib/temporal';
+import { ClassLogging } from '../lib/logging';
+import { ClassFileUpload } from '../lib/fileUpload';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -66,6 +69,18 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'monitoringService' && option.value === 'yes',
     );
 
+    const shouldInitializeTemporal = options.some(
+      (option) => option.name === 'temporal' && option.value === 'yes',
+    );
+
+    const shouldInitializeLogging = options.some(
+      (option) => option.name === 'logging' && option.value === 'yes',
+    );
+
+    const shouldInitializeFileUpload = options.some(
+      (option) => option.name === 'fileUpload' && option.value === 'yes',
+    );
+
     const projectDirectory = getProjectDirectory(
       getApplicationNameInput(inputs)!,
       directoryOption,
@@ -78,7 +93,7 @@ export class NewAction extends AbstractAction {
         projectDirectory,
         shouldInitializePrima as boolean,
         shouldInitializeUserService as boolean,
-        shouldInstallMonitoring as boolean,
+        shouldInitializeTemporal as boolean,
       );
 
       await createPrismaFiles(
@@ -106,6 +121,24 @@ export class NewAction extends AbstractAction {
       projectDirectory,
       shouldInstallMonitoring as boolean,
       shouldInitializeMonitoring as boolean,
+    );
+
+    await createTemporal(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInitializeTemporal as boolean,
+    );
+
+    await createLogging(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInitializeLogging as boolean,
+    );
+
+    await createFileUpload(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInitializeFileUpload as boolean,
     );
 
     if (!isDryRunEnabled) {
@@ -143,6 +176,15 @@ const getMonitoringInput = (inputs: Input[]) =>
 
 const getMonitoringServiceInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'monitoringService');
+
+const getTemporalInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'temporal');
+
+const getLoggingInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'logging');
+
+const getFileUploadInput = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'fileUpload');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -200,6 +242,24 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     replaceInputMissingInformation(options, answers);
   }
 
+  const temporalInput = getTemporalInput(options);
+  if (!temporalInput!.value) {
+    const answers = await askForTemporal();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const loggingInput = getLoggingInput(options);
+  if (!loggingInput!.value) {
+    const answers = await askForLogging();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const fileUploadInput = getFileUploadInput(options);
+  if (!fileUploadInput!.value) {
+    const answers = await askForFileUpload();
+    replaceInputMissingInformation(options, answers);
+  }
+
   const packageManagerInput = getPackageManagerInput(options);
   if (!packageManagerInput!.value) {
     const answers = await askForPackageManager();
@@ -250,7 +310,7 @@ const installPackages = async (
   installDirectory: string,
   shouldInitializePrima: boolean,
   shouldInitialzeUserService: boolean,
-  shouldInstallMonitoring: boolean,
+  shouldInitializeTemporal: boolean,
 ) => {
   const inputPackageManager = getPackageManagerInput(options)!.value as string;
 
@@ -269,7 +329,7 @@ const installPackages = async (
       inputPackageManager,
       shouldInitializePrima,
       shouldInitialzeUserService,
-      shouldInstallMonitoring,
+      shouldInitializeTemporal,
     );
   } catch (error) {
     if (error && error.message) {
@@ -408,6 +468,80 @@ const createMonitor = async (
   }
 };
 
+const createTemporal = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeTemporal: boolean,
+) => {
+  if (!shouldInitializeTemporal) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const TemporalInstance = new ClassTemporal();
+  try {
+    await TemporalInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not create the temporal files');
+  }
+};
+
+const createLogging = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeLogging: boolean,
+) => {
+  if (!shouldInitializeLogging) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const LoggingInstance = new ClassLogging();
+  try {
+    await LoggingInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not create the logging folder');
+  }
+};
+
+const createFileUpload = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeFileUpload: boolean,
+) => {
+  if (!shouldInitializeFileUpload) {
+    return;
+  }
+
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+
+  const FileUploadInstance = new ClassFileUpload();
+  try {
+    await FileUploadInstance.create(createDirectory);
+  } catch (error) {
+    console.error('could not modify the app.module with monitoring');
+  }
+};
+
+//ASK FOR INPUTS
+
 const askForPackageManager = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
@@ -461,6 +595,30 @@ const askForMonitoringService = async (): Promise<Answers> => {
       'yes',
       'no',
     ]),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForTemporal = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('temporal')(MESSAGES.TEMPORAL_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForLogging = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('logging')(MESSAGES.LOGGING_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForFileUpload = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('fileUpload')(MESSAGES.FILE_UPLOAD_QUESTION)(['yes', 'no']),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);

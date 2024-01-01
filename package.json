@@ -1,6 +1,6 @@
 {
   "name": "@samagra-x/stencil-cli",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Stencil cli for custom nest bootstrap",
   "publishConfig": {
     "access": "public"
