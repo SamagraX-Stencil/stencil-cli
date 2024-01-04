@@ -657,16 +657,9 @@ const printCollective = () => {
   const emptyLine = print();
 
   emptyLine();
-  yellow(`Thanks for installing Nest ${EMOJIS.PRAY}`);
-  dim('Please consider donating to our open collective');
-  dim('to help us maintain this package.');
+  yellow(`Thanks for using Stencil 🚀🚀`);
   emptyLine();
   emptyLine();
-  print()(
-    `${chalk.bold(`${EMOJIS.WINE}  Donate:`)} ${chalk.underline(
-      'https://opencollective.com/nest',
-    )}`,
-  );
   emptyLine();
 };
 
