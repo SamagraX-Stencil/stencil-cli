@@ -4,6 +4,7 @@ import {
   PackageManagerFactory,
   PnpmPackageManager,
   YarnPackageManager,
+  BunPackageManager,
 } from '../../../lib/package-managers';
 
 jest.mock('fs', () => ({
@@ -45,11 +46,21 @@ describe('PackageManagerFactory', () => {
       );
     });
 
+    it('should return BunPackageManager when "bun.lockb" file is found', async () => {
+      (fs.promises.readdir as jest.Mock).mockResolvedValue(['bun.lockb']);
+
+      const whenPackageManager = PackageManagerFactory.find();
+      await expect(whenPackageManager).resolves.toBeInstanceOf(
+        BunPackageManager,
+      );
+    });
+
     describe('when there are all supported lock files', () => {
       it('should prioritize "yarn.lock" file over all the others lock files', async () => {
         (fs.promises.readdir as jest.Mock).mockResolvedValue([
           'pnpm-lock.yaml',
           'package-lock.json',
+          'bun.lockb',
           // This is intentionally the last element in this array
           'yarn.lock',
         ]);
