@@ -35,6 +35,7 @@ export const defaultGitIgnore = `# compiled output
 logs
 *.log
 npm-debug.log*
+bun-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
