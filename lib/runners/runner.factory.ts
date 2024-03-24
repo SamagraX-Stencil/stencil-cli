@@ -4,6 +4,7 @@ import { Runner } from './runner';
 import { SchematicRunner } from './schematic.runner';
 import { YarnRunner } from './yarn.runner';
 import { PnpmRunner } from './pnpm.runner';
+import { BunRunner } from './bun.runner';
 import { StencilRunner } from './stencil.runner';
 import { NpxRunner } from './npx.runner';
 
@@ -21,6 +22,9 @@ export class RunnerFactory {
 
       case Runner.PNPM:
         return new PnpmRunner();
+
+      case Runner.BUN:
+        return new BunRunner();  
 
       case Runner.STENCIL:
         return new StencilRunner();

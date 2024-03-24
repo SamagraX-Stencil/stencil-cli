@@ -548,6 +548,7 @@ const askForPackageManager = async (): Promise<Answers> => {
       PackageManager.NPM,
       PackageManager.YARN,
       PackageManager.PNPM,
+      PackageManager.BUN
     ]),
   ];
   const prompt = inquirer.createPromptModule();
