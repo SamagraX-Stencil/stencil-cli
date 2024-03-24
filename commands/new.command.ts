@@ -33,38 +33,35 @@ export class NewCommand extends AbstractCommand {
       )
       .option('--strict', 'Enables strict mode in TypeScript.', false)
       .option(
-        '-ps, --prisma [prisma]',
+        '--ps, --prisma [prisma]',
         'If you want prisma setup in the project',
       )
       .option(
-        '-us, --user-service [userService]',
+        '--us, --user-service [userService]',
         'If you user service setup in the project',
       )
       .option(
-        '-fs, --fixtures [fixtures]',
+        '--fs, --fixtures [fixtures]',
         'If you want to have fixtures in the project',
       )
       .option(
-        '-mo, --monitoring [monitoring]',
+        '--mo, --monitoring [monitoring]',
         'If you want to have monitoring setup in the project',
       )
       .option(
-        '-ms, --monitoringService [monitoringService]',
+        '--ms, --monitoringService [monitoringService]',
         'If you want to have monitoring-service setup in the project',
       )
       .option(
-        '-te',
-        '--temporal [temporal]',
+        '--te, --temporal [temporal]',
         'If you want to have temporal setup in the project',
       )
       .option(
-        '-lg',
-        '--logging [logging]',
+        '--lg, --logging [logging]',
         'If you want to have logging setup in the project',
       )
       .option(
-        'fu',
-        '--fileUpload [fileUpload]',
+        '--fu, --fileUpload [fileUpload]',
         'If you want to have fileUpload setup in the project',
       )
       .action(async (name: string, command: Command) => {
