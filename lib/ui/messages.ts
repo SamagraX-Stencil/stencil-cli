@@ -53,6 +53,7 @@ export const MESSAGES = {
   LOGGING_QUESTION: 'Do you want to setup logging in this project ?',
   LOGGING_START: 'Starting to create the logging files in services folder',
   LOGGING_ERROR: "Couldn't create the logging files in services folder",
+  ENV_UPDATION_ERROR: "Couldn't update the .env file",
   FILE_UPLOAD_QUESTION: 'Do you want to setup file upload in this project ?',
   FILE_UPLOAD_START: 'Starting to add file upload to app.module.ts',
   FILE_UPLOAD_ERROR: "Couldn't add file upload to app.module.ts",
