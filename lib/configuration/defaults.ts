@@ -30,7 +30,7 @@ export const defaultOutDir = 'dist';
 export const defaultGitIgnore = `# compiled output
 /dist
 /node_modules
-
+.env
 # Logs
 logs
 *.log
