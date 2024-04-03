@@ -664,7 +664,7 @@ const copyEnvFile = async (dir: string, envExample: string, envFile: string) => 
     if (envExists) {
       envContent = await fs.promises.readFile(envPath, 'utf-8');
     }
-    envContent += envExampleContent;
+    envContent +='\n'+ envExampleContent;
 
     await fs.promises.writeFile(envPath, envContent);
   } catch (error) {
