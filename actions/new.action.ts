@@ -645,10 +645,10 @@ const initializeGitRepository = async (dir: string) => {
 const createGitIgnoreFile = (dir: string, content?: string) => {
   const fileContent = content || defaultGitIgnore;
   const filePath = join(process.cwd(), dir, '.gitignore');
-
-  if (fileExists(filePath)) {
-    return;
-  }
+  // Reason: (https://github.com/SamagraX-Stencil/stencil-cli/issues/2#issuecomment-2021300085)
+  // if (fileExists(filePath)) {
+  //   return;
+  // }
   return fs.promises.writeFile(filePath, fileContent);
 };
 
