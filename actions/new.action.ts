@@ -145,6 +145,7 @@ export class NewAction extends AbstractAction {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
+        await copyEnvFile(projectDirectory, 'env-example', '.env');
       }
 
       //pass shouldInitializeFixtures if we make this an option in the future
@@ -650,6 +651,25 @@ const createGitIgnoreFile = (dir: string, content?: string) => {
   //   return;
   // }
   return fs.promises.writeFile(filePath, fileContent);
+};
+
+const copyEnvFile = async (dir: string, envExample: string, envFile: string) => {
+  const envExamplePath = join(process.cwd(), dir, envExample);
+  const envPath = join(process.cwd(), dir, envFile);
+
+  try {
+    const envExampleContent = await fs.promises.readFile(envExamplePath, 'utf-8');
+    const envExists = fs.existsSync(envPath);
+    let envContent = '';
+    if (envExists) {
+      envContent = await fs.promises.readFile(envPath, 'utf-8');
+    }
+    envContent +='\n'+ envExampleContent;
+
+    await fs.promises.writeFile(envPath, envContent);
+  } catch (error) {
+    console.error(chalk.red(MESSAGES.ENV_UPDATION_ERROR));
+  }
 };
 
 const printCollective = () => {
