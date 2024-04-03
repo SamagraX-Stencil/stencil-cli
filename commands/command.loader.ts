@@ -5,6 +5,7 @@ import {
   BuildAction,
   GenerateAction,
   InfoAction,
+  ListAction,
   NewAction,
   StartAction,
 } from '../actions';
@@ -13,6 +14,7 @@ import { AddCommand } from './add.command';
 import { BuildCommand } from './build.command';
 import { GenerateCommand } from './generate.command';
 import { InfoCommand } from './info.command';
+import { ListCommand } from './list.command';
 import { NewCommand } from './new.command';
 import { StartCommand } from './start.command';
 export class CommandLoader {
@@ -21,6 +23,7 @@ export class CommandLoader {
     new BuildCommand(new BuildAction()).load(program);
     new StartCommand(new StartAction()).load(program);
     new InfoCommand(new InfoAction()).load(program);
+    new ListCommand(new ListAction()).load(program);
     new AddCommand(new AddAction()).load(program);
     await new GenerateCommand(new GenerateAction()).load(program);
 
