@@ -116,11 +116,6 @@ export class NestCollection extends AbstractCollection {
       description: 'Generate the Prisma service file',
     },
     {
-      name: 'service-prisma',
-      alias: 'sp',
-      description: 'Generate the Prisma service file',
-    },
-    {
       name: 'service-user',
       alias: 'su',
       description: 'Add the User Service module from the package.',
