@@ -145,6 +145,7 @@ export class NewAction extends AbstractAction {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
+        await createRegistry(projectDirectory, shouldInitializePrima,shouldInitializeUserService,shouldInstallMonitoring, shouldInitializeMonitoring,shouldInitializeTemporal,shouldInitializeLogging,shouldInitializeFileUpload);
         await copyEnvFile(projectDirectory, 'env-example', '.env');
       }
 
@@ -671,6 +672,38 @@ const copyEnvFile = async (dir: string, envExample: string, envFile: string) => 
     console.error(chalk.red(MESSAGES.ENV_UPDATION_ERROR));
   }
 };
+
+const createRegistry = async (
+  dir: string,
+  shouldInitializePrisma: boolean,
+  shouldInitializeUserService: boolean,
+  shouldInstallMonitoring: boolean,
+  shouldInitializeMonitoring: boolean,
+  shouldInitializeTemporal: boolean,
+  shouldInitializeLogging: boolean,
+  shouldInitializeFileUpload: boolean
+): Promise<void> => {
+  const filePath = join(process.cwd(), dir, '.stencil');
+  
+  const setupInfo = [
+    shouldInitializePrisma ? 'Prisma Setup' : '',
+    shouldInitializeUserService ? 'User Services Setup' : '',
+    shouldInstallMonitoring ? 'Monitoring Installed' : '',
+    shouldInitializeMonitoring ? 'Monitoring Setup' : '',
+    shouldInitializeTemporal ? 'Temporal Setup' : '',
+    shouldInitializeLogging ? 'Logging Setup' : '',
+    shouldInitializeFileUpload ? 'File Upload Setup' : ''
+  ].filter(info => info !== '').join('\n');
+
+  try {
+    await fs.promises.access(filePath, fs.constants.F_OK);
+    console.log('.stencil file already exists');
+  } catch (error) {
+    await fs.promises.writeFile(filePath, setupInfo);
+    console.log('.stencil file created');
+  }
+};
+
 
 const printCollective = () => {
   const dim = print('dim');
