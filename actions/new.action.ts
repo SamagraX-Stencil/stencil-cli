@@ -1,6 +1,7 @@
 import * as chalk from 'chalk';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 import * as inquirer from 'inquirer';
 import { Answers, Question } from 'inquirer';
 import { join } from 'path';
@@ -145,7 +146,17 @@ export class NewAction extends AbstractAction {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
-        await createRegistry(projectDirectory, shouldInitializePrima,shouldInitializeUserService,shouldInstallMonitoring, shouldInitializeMonitoring,shouldInitializeTemporal,shouldInitializeLogging,shouldInitializeFileUpload);
+        await createRegistry(projectDirectory, {
+          projectName: getApplicationNameInput(inputs)!.value as string,
+          prismaSetup: shouldInitializePrima,
+          userServiceSetup: shouldInitializeUserService,
+          monitoringSetup: shouldInstallMonitoring,
+          monitoringServicesSetup: shouldInitializeMonitoring,
+          temporalSetup: shouldInitializeTemporal,
+          loggingSetup: shouldInitializeLogging,
+          fileUploadSetup: shouldInitializeFileUpload,
+          packageManager: getPackageManagerInput(options)!.value as string
+        });
         await copyEnvFile(projectDirectory, 'env-example', '.env');
       }
 
@@ -213,13 +224,13 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   }
 
   const prismaInput = getPrismaInput(options);
-  if (!prismaInput!.value) {
+  if (prismaInput && prismaInput.value === undefined) {
     const answers = await askForPrisma();
     replaceInputMissingInformation(options, answers);
   }
 
   const userServiceInput = getUserServiceInput(options);
-  if (!userServiceInput!.value) {
+  if (userServiceInput && userServiceInput.value===undefined) {
     const answers = await askForUserService();
     replaceInputMissingInformation(options, answers);
   }
@@ -233,31 +244,31 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   // }
 
   const monitoringInput = getMonitoringInput(options);
-  if (!monitoringInput!.value) {
+  if (monitoringInput && monitoringInput.value===undefined) {
     const answers = await askForMonitoring();
     replaceInputMissingInformation(options, answers);
   }
 
   const monitoringServiceInput = getMonitoringServiceInput(options);
-  if (!monitoringServiceInput!.value) {
+  if (monitoringServiceInput && monitoringServiceInput.value===undefined) {
     const answers = await askForMonitoringService();
     replaceInputMissingInformation(options, answers);
   }
 
   const temporalInput = getTemporalInput(options);
-  if (!temporalInput!.value) {
+  if (temporalInput && temporalInput.value===undefined) {
     const answers = await askForTemporal();
     replaceInputMissingInformation(options, answers);
   }
 
   const loggingInput = getLoggingInput(options);
-  if (!loggingInput!.value) {
+  if (loggingInput && loggingInput.value===undefined) {
     const answers = await askForLogging();
     replaceInputMissingInformation(options, answers);
   }
 
   const fileUploadInput = getFileUploadInput(options);
-  if (!fileUploadInput!.value) {
+  if (fileUploadInput && fileUploadInput.value===undefined) {
     const answers = await askForFileUpload();
     replaceInputMissingInformation(options, answers);
   }
@@ -674,35 +685,37 @@ const copyEnvFile = async (dir: string, envExample: string, envFile: string) => 
 };
 
 const createRegistry = async (
-  dir: string,
-  shouldInitializePrisma: boolean,
-  shouldInitializeUserService: boolean,
-  shouldInstallMonitoring: boolean,
-  shouldInitializeMonitoring: boolean,
-  shouldInitializeTemporal: boolean,
-  shouldInitializeLogging: boolean,
-  shouldInitializeFileUpload: boolean
+  projectDirectory: string,
+  spec: {
+    projectName: string,
+    prismaSetup: boolean,
+    userServiceSetup: boolean,
+    monitoringSetup: boolean,
+    monitoringServicesSetup: boolean,
+    temporalSetup: boolean,
+    loggingSetup: boolean,
+    fileUploadSetup: boolean,
+    packageManager: string
+  }
 ): Promise<void> => {
-  const filePath = join(process.cwd(), dir, '.stencil');
-  
-  const setupInfo = [
-    shouldInitializePrisma ? 'Prisma Setup' : '',
-    shouldInitializeUserService ? 'User Services Setup' : '',
-    shouldInstallMonitoring ? 'Monitoring Installed' : '',
-    shouldInitializeMonitoring ? 'Monitoring Setup' : '',
-    shouldInitializeTemporal ? 'Temporal Setup' : '',
-    shouldInitializeLogging ? 'Logging Setup' : '',
-    shouldInitializeFileUpload ? 'File Upload Setup' : ''
-  ].filter(info => info !== '').join('\n');
+  const { projectName, packageManager, ...setupInfo } = spec;
 
+  const filePath = join(process.cwd(), projectDirectory, 'spec.yaml');
+  
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
-    console.log('.stencil file already exists');
+    console.log('spec.yaml file already exists');
   } catch (error) {
-    await fs.promises.writeFile(filePath, setupInfo);
-    console.log('.stencil file created');
+    const yamlContent = yaml.dump({
+      projectName,
+      packageManager,
+      ...setupInfo
+    });
+    await fs.promises.writeFile(filePath, yamlContent);
+    console.log('spec.yaml file created');
   }
 };
+
 
 
 const printCollective = () => {

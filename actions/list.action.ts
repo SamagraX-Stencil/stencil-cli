@@ -19,18 +19,18 @@ export class ListAction extends AbstractAction {
     await this.loadRegistry();
   }
   private async loadRegistry(): Promise<void>  {
-        const stencilFilePath = join(process.cwd(), '.stencil');
+        const stencilFilePath = join(process.cwd(), 'spec.yaml');
         try {
             const stencilFileContent = await fs.promises.readFile(stencilFilePath, 'utf-8');
 
             if (stencilFileContent.trim() === '') {
-                console.log(chalk.yellow('No modules found'));
+                console.log(chalk.yellow('No spec file found'));
               } else {
-                console.log(chalk.green('Installed Modules:'));
+                console.log(chalk.green('Specification file'));
                 console.log(stencilFileContent);
               }
         }catch (error) {
-            console.error(chalk.red('Error reading .stencil file'));
+            console.error(chalk.red('Error reading spec file'));
         }
         
     }
