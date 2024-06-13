@@ -36,11 +36,8 @@ function createSpec(
   return output;
 }
 
-/**
- * This test is temporarily skipped because it's flaky on CI.
- * Not yet clear why but it's not a blocker.
- */
-describe.skip('tsconfig paths hooks', () => {
+
+describe('tsconfig paths hooks', () => {
   it('should remove type imports', async () => {
     const output = createSpec(path.join(__dirname, './fixtures/type-imports'), [
       'src/main.ts',
