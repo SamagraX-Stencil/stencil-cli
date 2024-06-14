@@ -64,11 +64,6 @@ export class NewAction extends AbstractAction {
     const shouldInstallMonitoring = options.some(
       (option) => option.name === 'monitoring' && option.value === 'yes',
     );
-
-    const shouldInitializeMonitoring = options.some(
-      (option) => option.name === 'monitoringService' && option.value === 'yes',
-    );
-
     const shouldInitializeTemporal = options.some(
       (option) => option.name === 'temporal' && option.value === 'yes',
     );
@@ -116,13 +111,6 @@ export class NewAction extends AbstractAction {
       shouldInstallMonitoring as boolean,
     );
 
-    await createMonitor(
-      isDryRunEnabled as boolean,
-      projectDirectory,
-      shouldInstallMonitoring as boolean,
-      shouldInitializeMonitoring as boolean,
-    );
-
     await createTemporal(
       isDryRunEnabled as boolean,
       projectDirectory,
@@ -145,7 +133,7 @@ export class NewAction extends AbstractAction {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
-        await createRegistry(projectDirectory, shouldInitializePrima,shouldInitializeUserService,shouldInstallMonitoring, shouldInitializeMonitoring,shouldInitializeTemporal,shouldInitializeLogging,shouldInitializeFileUpload);
+        await createRegistry(projectDirectory, shouldInitializePrima,shouldInitializeUserService,shouldInstallMonitoring,shouldInitializeTemporal,shouldInitializeLogging,shouldInitializeFileUpload);
         await copyEnvFile(projectDirectory, 'env-example', '.env');
       }
 
@@ -175,9 +163,6 @@ const getFixturesInput = (inputs: Input[]) =>
 
 const getMonitoringInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'monitoring');
-
-const getMonitoringServiceInput = (inputs: Input[]) =>
-  inputs.find((options) => options.name === 'monitoringService');
 
 const getTemporalInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'temporal');
@@ -235,12 +220,6 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   const monitoringInput = getMonitoringInput(options);
   if (!monitoringInput!.value) {
     const answers = await askForMonitoring();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const monitoringServiceInput = getMonitoringServiceInput(options);
-  if (!monitoringServiceInput!.value) {
-    const answers = await askForMonitoringService();
     replaceInputMissingInformation(options, answers);
   }
 
@@ -440,33 +419,9 @@ const installMonitoring = async (
   const MonitoringInstance = new ClassMonitoring();
   try {
     await MonitoringInstance.addImport(createDirectory);
-  } catch (error) {
-    console.error('could not modify the app.module with monitoring');
-  }
-};
-
-const createMonitor = async (
-  dryRunMode: boolean,
-  createDirectory: string,
-  shouldInstallMonitoring: boolean,
-  shouldInitializeMonitoring: boolean,
-) => {
-  if (!shouldInstallMonitoring || !shouldInitializeMonitoring) {
-    return;
-  }
-
-  if (dryRunMode) {
-    console.info();
-    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
-    console.info();
-    return;
-  }
-
-  const MonitoringInstance = new ClassMonitoring();
-  try {
     await MonitoringInstance.createFiles(createDirectory);
   } catch (error) {
-    console.error('could not generate the monitor files');
+    console.error('could not modify the app.module with monitoring');
   }
 };
 
@@ -592,17 +547,6 @@ const askForMonitoring = async (): Promise<Answers> => {
   return await prompt(questions);
 };
 
-const askForMonitoringService = async (): Promise<Answers> => {
-  const questions: Question[] = [
-    generateSelect('monitoringService')(MESSAGES.MONITORING_SERVICE_QUESTION)([
-      'yes',
-      'no',
-    ]),
-  ];
-  const prompt = inquirer.createPromptModule();
-  return await prompt(questions);
-};
-
 const askForTemporal = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('temporal')(MESSAGES.TEMPORAL_QUESTION)(['yes', 'no']),
@@ -678,7 +622,6 @@ const createRegistry = async (
   shouldInitializePrisma: boolean,
   shouldInitializeUserService: boolean,
   shouldInstallMonitoring: boolean,
-  shouldInitializeMonitoring: boolean,
   shouldInitializeTemporal: boolean,
   shouldInitializeLogging: boolean,
   shouldInitializeFileUpload: boolean
@@ -689,7 +632,6 @@ const createRegistry = async (
     shouldInitializePrisma ? 'Prisma Setup' : '',
     shouldInitializeUserService ? 'User Services Setup' : '',
     shouldInstallMonitoring ? 'Monitoring Installed' : '',
-    shouldInitializeMonitoring ? 'Monitoring Setup' : '',
     shouldInitializeTemporal ? 'Temporal Setup' : '',
     shouldInitializeLogging ? 'Logging Setup' : '',
     shouldInitializeFileUpload ? 'File Upload Setup' : ''

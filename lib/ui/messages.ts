@@ -43,8 +43,6 @@ export const MESSAGES = {
   MONITORING_QUESTION: 'Do you want to add monitoring to this project ?',
   MONITORING_INSTALL_START: 'Starting to add monitoring to app.module.ts',
   MONITORING_INSTALL_ERROR: "Couldn't add monitoring to app.module.ts",
-  MONITORING_SERVICE_QUESTION:
-    'Do you want to setup monitoring services in this project ?',
   MONITOR_GENERATION_START: 'Starting the generation of the monitor folder',
   MONITOR_GENERATION_ERROR: 'Could not generate the monitor folder',
   TEMPORAL_QUESTION: 'Do you want to setup temporal in this project ?',
