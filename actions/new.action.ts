@@ -29,6 +29,9 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
+import { ClassskipDocker } from '../lib/skipDocker';
+
+
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -74,6 +77,10 @@ export class NewAction extends AbstractAction {
 
     const shouldInitializeFileUpload = options.some(
       (option) => option.name === 'fileUpload' && option.value === 'yes',
+    );
+
+    const shouldInitializeskipDocker = options.some(
+      (option) => option.name === 'skipDocker' && option.value === 'yes',
     );
 
     const projectDirectory = getProjectDirectory(
@@ -129,6 +136,12 @@ export class NewAction extends AbstractAction {
       shouldInitializeFileUpload as boolean,
     );
 
+    await createskipDocker(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInitializeskipDocker as boolean,
+    );
+  
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
@@ -172,6 +185,9 @@ const getLoggingInput = (inputs: Input[]) =>
 
 const getFileUploadInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'fileUpload');
+
+const getskipDocker = (inputs: Input[]) =>
+  inputs.find((options) => options.name === 'skipDocker');
 
 const getProjectDirectory = (
   applicationName: Input,
@@ -238,6 +254,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   const fileUploadInput = getFileUploadInput(options);
   if (!fileUploadInput!.value) {
     const answers = await askForFileUpload();
+    replaceInputMissingInformation(options, answers);
+  }
+
+  const skipDockerInput = getskipDocker(options);
+  if(!skipDockerInput!.value) {
+    const answers = await askForSkipDocker();
     replaceInputMissingInformation(options, answers);
   }
 
@@ -495,7 +517,35 @@ const createFileUpload = async (
   } catch (error) {
     console.error('could not modify the app.module with monitoring');
   }
+}
+const createskipDocker = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeskipDocker: boolean,
+) => {
+  if (!shouldInitializeskipDocker) {
+    return;
+  }
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+  const skipDockerInstance = new ClassskipDocker();
+  try {
+    await skipDockerInstance.create(createDirectory);
+  } catch (error) {
+    console.log('could not skip the docker files');
+  }
 };
+// class ClassskipDocker {
+//   constructor(private cmd: string) {}
+
+//   public create(directory: string) {
+//     // implementation of the create method
+//   }
+// }
 
 //ASK FOR INPUTS
 
@@ -566,6 +616,14 @@ const askForLogging = async (): Promise<Answers> => {
 const askForFileUpload = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('fileUpload')(MESSAGES.FILE_UPLOAD_QUESTION)(['yes', 'no']),
+  ];
+  const prompt = inquirer.createPromptModule();
+  return await prompt(questions);
+};
+
+const askForSkipDocker = async (): Promise<Answers> => {
+  const questions: Question[] = [
+    generateSelect('skipDocker')(MESSAGES.SKIP_DOCKER_QUESTION)(['yes', 'no']),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);

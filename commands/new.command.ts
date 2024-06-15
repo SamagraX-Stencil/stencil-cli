@@ -60,6 +60,11 @@ export class NewCommand extends AbstractCommand {
         '--fu, --fileUpload [fileUpload]',
         'If you want to have fileUpload setup in the project',
       )
+      .option(
+        '--sd, --skipdocker [skipDocker]',
+        'If you want to skip docker setup in the project',
+      )
+
       .action(async (name: string, command: Command) => {
         const options: Input[] = [];
         const availableLanguages = ['js', 'ts', 'javascript', 'typescript'];
@@ -80,7 +85,8 @@ export class NewCommand extends AbstractCommand {
         options.push({ name: 'temporal', value: command.temporal });
         options.push({ name: 'logging', value: command.logging });
         options.push({ name: 'fileUpload', value: command.fileUpload });
-
+        options.push({ name: 'skipDocker', value: command.skipDocker });
+        
         if (!!command.language) {
           const lowercasedLanguage = command.language.toLowerCase();
           const langMatch = availableLanguages.includes(lowercasedLanguage);

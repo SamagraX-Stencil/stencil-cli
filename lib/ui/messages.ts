@@ -1,6 +1,7 @@
 import * as chalk from 'chalk';
 import { EMOJIS } from './emojis';
 
+
 export const MESSAGES = {
   PROJECT_SELECTION_QUESTION: 'Which project would you like to generate to?',
   LIBRARY_PROJECT_SELECTION_QUESTION:
@@ -48,6 +49,10 @@ export const MESSAGES = {
   TEMPORAL_QUESTION: 'Do you want to setup temporal in this project ?',
   TEMPORAL_START: 'Starting to setup temporal',
   TEMPORAL_ERROR: "Couldn't setup temporal",
+  SKIP_DOCKER_QUESTION: 'Do you want to skip docker setup in this project ?',
+  SKIP_DOCKER_START: 'Starting to skip docker setup',
+  SKIP_DOCKER_ERROR: "Couldn't skip docker setup",
+  SKIP_DOCKER_SUCCESS: 'Successfully skipped docker setup',
   LOGGING_QUESTION: 'Do you want to setup logging in this project ?',
   LOGGING_START: 'Starting to create the logging files in services folder',
   LOGGING_ERROR: "Couldn't create the logging files in services folder",

@@ -170,6 +170,12 @@ export class NestCollection extends AbstractCollection {
       alias: 'fu',
       description: 'If you want to have fileUpload setup in the project.',
     },
+
+    {
+      name: 'skipDocker',
+      alias: 'sd',
+      description: 'If you want to skip docker setup in the project.',
+    }
   ];
 
   constructor(runner: AbstractRunner) {
