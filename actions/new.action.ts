@@ -29,7 +29,7 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
-import { ClassskipDocker } from '../lib/skipDocker';
+
 
 
 
@@ -117,6 +117,13 @@ export class NewAction extends AbstractAction {
       projectDirectory,
       shouldInstallMonitoring as boolean,
     );
+    
+    await createskipDocker(
+      isDryRunEnabled as boolean,
+      projectDirectory,
+      shouldInitializeskipDocker as boolean,
+      shouldInstallMonitoring as  boolean,
+    );
 
     await createTemporal(
       isDryRunEnabled as boolean,
@@ -136,11 +143,7 @@ export class NewAction extends AbstractAction {
       shouldInitializeFileUpload as boolean,
     );
 
-    await createskipDocker(
-      isDryRunEnabled as boolean,
-      projectDirectory,
-      shouldInitializeskipDocker as boolean,
-    );
+    
   
     if (!isDryRunEnabled) {
       if (!shouldSkipGit) {
@@ -258,10 +261,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   }
 
   const skipDockerInput = getskipDocker(options);
-  if(!skipDockerInput!.value) {
+  if(monitoringInput!.value === 'yes'){
+    if(!skipDockerInput!.value) {
     const answers = await askForSkipDocker();
     replaceInputMissingInformation(options, answers);
-  }
+  }}
+  
 
   const packageManagerInput = getPackageManagerInput(options);
   if (!packageManagerInput!.value) {
@@ -441,11 +446,39 @@ const installMonitoring = async (
   const MonitoringInstance = new ClassMonitoring();
   try {
     await MonitoringInstance.addImport(createDirectory);
-    await MonitoringInstance.createFiles(createDirectory);
   } catch (error) {
     console.error('could not modify the app.module with monitoring');
   }
 };
+
+const createskipDocker = async (
+  dryRunMode: boolean,
+  createDirectory: string,
+  shouldInitializeskipDocker: boolean,
+  shouldInstallMonitoring: boolean,
+) => {
+  if (!shouldInstallMonitoring) {
+    return;
+  }
+  if (dryRunMode) {
+    console.info();
+    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
+    console.info();
+    return;
+  }
+  const MonitoringInstance = new ClassMonitoring();
+  try {    
+  if (!shouldInitializeskipDocker) {
+    await MonitoringInstance.createFiles(createDirectory);
+  }
+  else{
+    return;
+  }
+  } catch(error) {
+    console.error('Could not skip docker setup');
+  }
+};
+
 
 const createTemporal = async (
   dryRunMode: boolean,
@@ -517,36 +550,7 @@ const createFileUpload = async (
   } catch (error) {
     console.error('could not modify the app.module with monitoring');
   }
-}
-const createskipDocker = async (
-  dryRunMode: boolean,
-  createDirectory: string,
-  shouldInitializeskipDocker: boolean,
-) => {
-  if (!shouldInitializeskipDocker) {
-    return;
-  }
-  if (dryRunMode) {
-    console.info();
-    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
-    console.info();
-    return;
-  }
-  const skipDockerInstance = new ClassskipDocker();
-  try {
-    await skipDockerInstance.create(createDirectory);
-  } catch (error) {
-    console.log('could not skip the docker files');
-  }
 };
-// class ClassskipDocker {
-//   constructor(private cmd: string) {}
-
-//   public create(directory: string) {
-//     // implementation of the create method
-//   }
-// }
-
 //ASK FOR INPUTS
 
 const askForPackageManager = async (): Promise<Answers> => {

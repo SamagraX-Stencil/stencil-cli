@@ -61,7 +61,7 @@ export class NewCommand extends AbstractCommand {
         'If you want to have fileUpload setup in the project',
       )
       .option(
-        '--sd, --skipdocker [skipDocker]',
+        '--sd, --skipDocker [skipDocker]',
         'If you want to skip docker setup in the project',
       )
 
