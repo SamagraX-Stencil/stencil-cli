@@ -34,58 +34,42 @@ export class NewCommand extends AbstractCommand {
       )
       .option('--strict', 'Enables strict mode in TypeScript.', false)
       .option('--ps, --prisma [prisma]', 'If you want prisma setup in the project', (value) => {
-        // if (value === 'true') return true;
-        // if (value === 'false') return false;
         return value;
       })
       
       .option(
         '--us, --user-service [userService]',
         'If you user service setup in the project', (value) => {
-          // if (value === 'true') return true;
-          // if (value === 'false') return false;
           return value;
         })
       .option(
         '--fs, --fixtures [fixtures]',
         'If you want to have fixtures in the project',(value) => {
-          // if (value === 'true') return true;
-          // if (value === 'false') return false;
           return value;
         })
       .option(
         '--mo, --monitoring [monitoring]',
         'If you want to have monitoring setup in the project',(value) => {
-          if (value === 'true') return true;
-          if (value === 'false') return false;
           return value;
         })
       .option(
         '--ms, --monitoringService [monitoringService]',
         'If you want to have monitoring-service setup in the project',(value) => {
-          if (value === 'true') return true;
-          if (value === 'false') return false;
           return value;
         })
       .option(
         '--te, --temporal [temporal]',
         'If you want to have temporal setup in the project',(value) => {
-          if (value === 'true') return true;
-          if (value === 'false') return false;
           return value;
         })
       .option(
         '--lg, --logging [logging]',
         'If you want to have logging setup in the project',(value) => {
-          if (value === 'true') return true;
-          if (value === 'false') return false;
           return value;
         })
       .option(
         '--fu, --fileUpload [fileUpload]',
         'If you want to have fileUpload setup in the project',(value) => {
-          if (value === 'true') return true;
-          if (value === 'false') return false;
           return value;
         })
       .action(async (name: string, command: Command) => {
@@ -137,16 +121,7 @@ export class NewCommand extends AbstractCommand {
 
         const inputs: Input[] = [];
         inputs.push({ name: 'name', value: name });
-        console.log(options);
         await this.action.handle(inputs, options);
-        const spinner = ora({
-          spinner: {
-            interval: 120,
-            frames: ['▹▹▹▹▹', '▸▹▹▹▹', '▹▸▹▹▹', '▹▹▸▹▹', '▹▹▹▸▹', '▹▹▹▹▸'],
-          },
-          text: MESSAGES.PACKAGE_MANAGER_INSTALLATION_IN_PROGRESS,
-        });
-        spinner.start();
       });
   }
 }

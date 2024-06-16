@@ -4,7 +4,7 @@ import * as fs from 'fs';
 import * as yaml from 'js-yaml';
 import * as inquirer from 'inquirer';
 import { Answers, Question } from 'inquirer';
-import { join } from 'path';
+import { join,basename } from 'path';
 import { Input } from '../commands';
 import { defaultGitIgnore } from '../lib/configuration/defaults';
 import {
@@ -223,61 +223,30 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     replaceInputMissingInformation(inputs, answers);
   }
 
-  const prismaInput = getPrismaInput(options);
-  if (prismaInput && prismaInput.value === undefined) {
-    const answers = await askForPrisma();
-    replaceInputMissingInformation(options, answers);
+  async function handleInput(
+    getInput: (options: any) => { value: any } | undefined,
+    askForInput: () => Promise<any>,
+    options: any
+  ) {
+    const input = getInput(options);
+    if (input && input.value === undefined) {
+      const answers = await askForInput();
+      replaceInputMissingInformation(options, answers);
+    }
   }
 
-  const userServiceInput = getUserServiceInput(options);
-  if (userServiceInput && userServiceInput.value===undefined) {
-    const answers = await askForUserService();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  //UNCOMMENT THE FOLLOWING FUNCTION IF WE WANT TO MAKE THIS AN OPTION IN THE FUTURE
-
-  // const fixturesInput = getFixturesInput(options);
-  // if (!fixturesInput!.value) {
-  //   const answers = await askForFixtures();
-  //   replaceInputMissingInformation(options, answers);
-  // }
-
-  const monitoringInput = getMonitoringInput(options);
-  if (monitoringInput && monitoringInput.value===undefined) {
-    const answers = await askForMonitoring();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const monitoringServiceInput = getMonitoringServiceInput(options);
-  if (monitoringServiceInput && monitoringServiceInput.value===undefined) {
-    const answers = await askForMonitoringService();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const temporalInput = getTemporalInput(options);
-  if (temporalInput && temporalInput.value===undefined) {
-    const answers = await askForTemporal();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const loggingInput = getLoggingInput(options);
-  if (loggingInput && loggingInput.value===undefined) {
-    const answers = await askForLogging();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const fileUploadInput = getFileUploadInput(options);
-  if (fileUploadInput && fileUploadInput.value===undefined) {
-    const answers = await askForFileUpload();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const packageManagerInput = getPackageManagerInput(options);
-  if (!packageManagerInput!.value) {
-    const answers = await askForPackageManager();
-    replaceInputMissingInformation(options, answers);
-  }
+  await handleInput(getPrismaInput, askForPrisma, options);
+  await handleInput(getUserServiceInput, askForUserService, options);
+  
+  // Uncomment the following function if we want to make this an option in the future
+  // await handleInput(getFixturesInput, askForFixtures, options);
+  
+  await handleInput(getMonitoringInput, askForMonitoring, options);
+  await handleInput(getMonitoringServiceInput, askForMonitoringService, options);
+  await handleInput(getTemporalInput, askForTemporal, options);
+  await handleInput(getLoggingInput, askForLogging, options);
+  await handleInput(getFileUploadInput, askForFileUpload, options);
+  await handleInput(getPackageManagerInput, askForPackageManager, options);
 };
 
 const replaceInputMissingInformation = (
@@ -704,18 +673,46 @@ const createRegistry = async (
   
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
-    console.log('spec.yaml file already exists');
   } catch (error) {
+    const tooling = [];
+    if (setupInfo.prismaSetup) tooling.push('prisma');
+    if (setupInfo.userServiceSetup) tooling.push('userService');
+    if (setupInfo.monitoringSetup) tooling.push('monitoring');
+    if (setupInfo.monitoringServicesSetup) tooling.push('monitoringService');
+    if (setupInfo.temporalSetup) tooling.push('temporal');
+    if (setupInfo.loggingSetup) tooling.push('logging');
+    if (setupInfo.fileUploadSetup) tooling.push('fileUpload');
+
     const yamlContent = yaml.dump({
-      projectName,
-      packageManager,
-      ...setupInfo
+      stencil: '0.0.1',
+      info: {
+        properties: {
+          'project-name': projectName,
+          'package-manager': packageManager
+        }
+      },
+      tooling,
+      endpoints: []
     });
     await fs.promises.writeFile(filePath, yamlContent);
-    console.log('spec.yaml file created');
+    console.info(MESSAGES.SPEC_CREATED);
+  }
+  await updateNestCliConfig(spec.projectName, filePath);
+};
+const updateNestCliConfig = async (projectName: string, specFilePath: string): Promise<void> => {
+  try {
+    const nestCliPath = join(process.cwd(), projectName, 'nest-cli.json');
+    const nestCliContent = await fs.promises.readFile(nestCliPath, 'utf-8');
+    const nestCliConfig = JSON.parse(nestCliContent);
+
+    nestCliConfig.specFile = specFilePath; 
+    nestCliConfig.specFile = basename(specFilePath); 
+
+    await fs.promises.writeFile(nestCliPath, JSON.stringify(nestCliConfig, null, 2));
+  } catch (error) {
+    console.error(chalk.red(`Error updating nest-cli.json: ${error.message}`));
   }
 };
-
 
 
 const printCollective = () => {
