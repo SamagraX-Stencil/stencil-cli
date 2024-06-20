@@ -547,30 +547,14 @@ const createFileUpload = async (
 
 const checkIfPackageManagerIsAvailable = (cmd: string): boolean => {
   try {
-    execSync(`command -v ${cmd}`, { stdio: 'ignore' });
+    execSync(`${cmd} -v`, { stdio: 'ignore' });
     return true;
   } catch (error) {
     return false;
   }
 };
 
-const installNpm = (): void => {
-  try {
-    const currentPlatform = platform();
-    if (currentPlatform === 'win32') {
-      // Windows installation command for npm via Node.js installer
-      console.log('Downloading and installing Node.js which includes npm...');
-      execSync('powershell -Command "Invoke-WebRequest -Uri https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi -OutFile nodejs.msi; Start-Process msiexec.exe -ArgumentList \'/i nodejs.msi /quiet\' -Wait; Remove-Item nodejs.msi"', { stdio: 'inherit' });
-    } else {
-      // Linux/macOS installation command for npm
-      execSync('curl -L https://www.npmjs.com/install.sh | sh', { stdio: 'inherit' });
-    }
-    console.log('npm has been installed.');
-  } catch (error) {
-    console.error('Failed to install npm:', error);
-    process.exit(1); 
-  }
-};
+
 
 const askForPackageManager = async (): Promise<Answers> => {
   const availablePackageManagers = [
@@ -580,11 +564,7 @@ const askForPackageManager = async (): Promise<Answers> => {
     PackageManager.BUN
   ].filter(pm => checkIfPackageManagerIsAvailable(pm));
 
-  if (availablePackageManagers.length === 0) {
-    console.log('No package managers found. Installing npm...');
-    installNpm();
-    return { packageManager: PackageManager.NPM };
-  }
+  
 
   const questions: Question[] = [
     generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)(availablePackageManagers),
