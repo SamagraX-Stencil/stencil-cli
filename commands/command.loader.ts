@@ -8,6 +8,7 @@ import {
   ListAction,
   NewAction,
   StartAction,
+  DockerAction,
 } from '../actions';
 import { ERROR_PREFIX } from '../lib/ui';
 import { AddCommand } from './add.command';
@@ -17,6 +18,7 @@ import { InfoCommand } from './info.command';
 import { ListCommand } from './list.command';
 import { NewCommand } from './new.command';
 import { StartCommand } from './start.command';
+import { DockerCommand } from './docker.command';
 export class CommandLoader {
   public static async load(program: CommanderStatic): Promise<void> {
     new NewCommand(new NewAction()).load(program);
@@ -25,6 +27,7 @@ export class CommandLoader {
     new InfoCommand(new InfoAction()).load(program);
     new ListCommand(new ListAction()).load(program);
     new AddCommand(new AddAction()).load(program);
+    new DockerCommand(new DockerAction()).load(program);
     await new GenerateCommand(new GenerateAction()).load(program);
 
     this.handleInvalidCommand(program);
