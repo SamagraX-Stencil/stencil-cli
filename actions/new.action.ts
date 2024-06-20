@@ -544,15 +544,34 @@ const createFileUpload = async (
 
 //ASK FOR INPUTS
 
+const checkIfPackageManagerIsAvailable = (cmd: string): boolean => {
+  try {
+    execSync(`command -v ${cmd}`, { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+
 const askForPackageManager = async (): Promise<Answers> => {
+  const availablePackageManagers = [
+    PackageManager.NPM,
+    PackageManager.YARN,
+    PackageManager.PNPM,
+    PackageManager.BUN
+  ].filter(pm => checkIfPackageManagerIsAvailable(pm));
+
+  if (availablePackageManagers.length === 0) {
+    console.log('No package managers found. Installing npm...');
+    // You can add logic here to install npm if needed.
+    return { packageManager: PackageManager.NPM };
+  }
+
   const questions: Question[] = [
-    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
-      PackageManager.NPM,
-      PackageManager.YARN,
-      PackageManager.PNPM,
-      PackageManager.BUN
-    ]),
+    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)(availablePackageManagers),
   ];
+
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
 };
