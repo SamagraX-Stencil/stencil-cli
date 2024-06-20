@@ -29,6 +29,7 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
+import { platform } from 'os';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -553,6 +554,23 @@ const checkIfPackageManagerIsAvailable = (cmd: string): boolean => {
   }
 };
 
+const installNpm = (): void => {
+  try {
+    const currentPlatform = platform();
+    if (currentPlatform === 'win32') {
+      // Windows installation command for npm via Node.js installer
+      console.log('Downloading and installing Node.js which includes npm...');
+      execSync('powershell -Command "Invoke-WebRequest -Uri https://nodejs.org/dist/v18.16.1/node-v18.16.1-x64.msi -OutFile nodejs.msi; Start-Process msiexec.exe -ArgumentList \'/i nodejs.msi /quiet\' -Wait; Remove-Item nodejs.msi"', { stdio: 'inherit' });
+    } else {
+      // Linux/macOS installation command for npm
+      execSync('curl -L https://www.npmjs.com/install.sh | sh', { stdio: 'inherit' });
+    }
+    console.log('npm has been installed.');
+  } catch (error) {
+    console.error('Failed to install npm:', error);
+    process.exit(1); 
+  }
+};
 
 const askForPackageManager = async (): Promise<Answers> => {
   const availablePackageManagers = [
@@ -564,7 +582,7 @@ const askForPackageManager = async (): Promise<Answers> => {
 
   if (availablePackageManagers.length === 0) {
     console.log('No package managers found. Installing npm...');
-    // You can add logic here to install npm if needed.
+    installNpm();
     return { packageManager: PackageManager.NPM };
   }
 
