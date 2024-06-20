@@ -12,7 +12,7 @@ import { MESSAGES } from '../lib/ui';
 
 export class DockerAction extends AbstractAction {
   private manager!: AbstractPackageManager;
-  private readonly servicesToCheck = ['logging', 'monitor', 'temporal'];
+  private readonly servicesToCheck = ['logging', 'monitoring', 'temporal'];
 
   public async handle(commandInputs: Input[]) {
     this.manager = await PackageManagerFactory.find();
