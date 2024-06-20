@@ -146,12 +146,7 @@ export class NestCollection extends AbstractCollection {
       description: 'Generate files in a .devcontainer file.',
     },
     {
-      name: 'monitorModule',
-      alias: 'mm',
-      description: 'add monitor related imports to the app.module.ts file ',
-    },
-    {
-      name: 'monitor',
+      name: 'monitoring',
       alias: 'mf',
       description: 'Generate monitor folder.',
     },
@@ -159,11 +154,6 @@ export class NestCollection extends AbstractCollection {
       name: 'service-temporal',
       alias: 'te',
       description: 'If you want to have temporal setup in the project.',
-    },
-    {
-      name: 'logging',
-      alias: 'lg',
-      description: 'If you want to have logging setup in the project.',
     },
     {
       name: 'service-file-upload',
