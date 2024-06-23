@@ -160,6 +160,31 @@ export class NestCollection extends AbstractCollection {
       alias: 'fu',
       description: 'If you want to have fileUpload setup in the project.',
     },
+    {
+      name: 'logging',
+      alias: 'lg',
+      description: 'If you want to have logging setup in the project.',
+    },
+    {
+      name: 'monitoringService',
+      alias: 'ms',
+      description: 'If you want to have monitoringService setup in the project.',
+    },
+    {
+      name: 'temporal',
+      alias: 'tp',
+      description: 'If you want to have temporal setup in the project.',
+    },
+    {
+      name: 'postgres',
+      alias: 'pg',
+      description: 'If you want to have postgres setup in the project.',
+    },
+    {
+      name: 'hasura',
+      alias: 'hs',
+      description: 'If you want to have hasura setup in the project.',
+    },
   ];
 
   constructor(runner: AbstractRunner) {

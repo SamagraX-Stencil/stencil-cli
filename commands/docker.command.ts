@@ -9,8 +9,10 @@ export class DockerCommand extends AbstractCommand {
       .alias('do')
       .description('Generate docker files for services')
       .action(async (services: string[]) => {
-        const inputs: Input[] = services.map(service => ({ name: 'service', value: service }));
-        await this.action.handle(inputs);
+        const inputs: Input[] = services.map(service => ({ name: 'name', value: service }));
+        for (const input of inputs) {
+          await this.action.handle([input]); 
+        }
       });
   }
 }
