@@ -1,7 +1,8 @@
 import { AbstractRunner } from '../runners';
 import { AbstractCollection } from './abstract.collection';
 import { SchematicOption } from './schematic.option';
-
+import * as chalk from 'chalk';
+import { buildSchematicsListAsTable, getCollection, getSchematics } from '../ui/table';
 export interface Schematic {
   name: string;
   alias: string;
@@ -203,7 +204,7 @@ export class NestCollection extends AbstractCollection {
   }
 
   public async execute(name: string, options: SchematicOption[],type: 'schematic' | 'docker') {
-    const schematic: string = this.validate(name,type);
+    const schematic: string = await this.validate(name,type);
     await super.execute(schematic, options);
   }
 
@@ -222,11 +223,13 @@ export class NestCollection extends AbstractCollection {
 
   }
 
-  private validate(name: string, type: 'schematic' | 'docker'): string {
+  private async validate(name: string, type: 'schematic' | 'docker'): Promise<string> {
     const schematic = (type === 'schematic' ? NestCollection.schematics : NestCollection.docker)
       .find((s) => s.name === name || s.alias === name);
     if (!schematic) {
-      console.error((`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`));
+      console.error(chalk.red(`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`));
+      const collection = await getCollection();
+      console.info(buildSchematicsListAsTable(await getSchematics(collection, type)));
       process.exit(1);
     }
     return schematic.name;
