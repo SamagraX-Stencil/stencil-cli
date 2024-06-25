@@ -8,6 +8,11 @@ export interface Schematic {
   description: string;
 }
 
+export interface Docker {
+  name: string;
+  alias: string;
+  description: string;
+}
 export class NestCollection extends AbstractCollection {
   private static schematics: Schematic[] = [
     {
@@ -160,57 +165,69 @@ export class NestCollection extends AbstractCollection {
       alias: 'fu',
       description: 'If you want to have fileUpload setup in the project.',
     },
+  ];
+  private static docker: Docker[] = [
+    {
+      name: 'docker-app',
+      alias: 'do-app',
+      description: '',
+    },
     {
       name: 'logging',
       alias: 'lg',
-      description: 'If you want to have logging setup in the project.',
+      description: 'Generate a docker service for logging',
     },
     {
       name: 'monitoringService',
       alias: 'ms',
-      description: 'If you want to have monitoringService setup in the project.',
+      description: 'Generate a docker service for monitoringService',
     },
     {
       name: 'temporal',
       alias: 'tp',
-      description: 'If you want to have temporal setup in the project.',
+      description: 'Generate a docker service for temporal',
     },
     {
       name: 'postgres',
       alias: 'pg',
-      description: 'If you want to have postgres setup in the project.',
+      description: 'Generate a docker compose for postgres',
     },
     {
       name: 'hasura',
       alias: 'hs',
-      description: 'If you want to have hasura setup in the project.',
+      description: 'Generate a docker compose for hasura.',
     },
   ];
-
   constructor(runner: AbstractRunner) {
     super('@samagra-x/schematics', runner);
   }
 
-  public async execute(name: string, options: SchematicOption[]) {
-    const schematic: string = this.validate(name);
+  public async execute(name: string, options: SchematicOption[],type: 'schematic' | 'docker') {
+    const schematic: string = this.validate(name,type);
     await super.execute(schematic, options);
   }
 
-  public getSchematics(): Schematic[] {
-    return NestCollection.schematics.filter(
-      (item) => item.name !== 'angular-app',
-    );
+  public getSchematics(type: 'schematic' | 'docker'): Schematic[]|Docker[] {
+    if (type === 'schematic') {
+      return NestCollection.schematics.filter(
+        (item) => item.name !== 'angular-app',
+      );
+    } else if (type === 'docker') {
+      return NestCollection.docker.filter(
+        (item) => item.name !== 'docker-app',
+      );
+    } else {
+      throw new Error('Invalid type specified');
+    }
+
   }
 
-  private validate(name: string) {
-    const schematic = NestCollection.schematics.find(
-      (s) => s.name === name || s.alias === name,
-    );
-
-    if (schematic === undefined || schematic === null) {
-      throw new Error(
-        `Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`,
-      );
+  private validate(name: string, type: 'schematic' | 'docker'): string {
+    const schematic = (type === 'schematic' ? NestCollection.schematics : NestCollection.docker)
+      .find((s) => s.name === name || s.alias === name);
+    if (!schematic) {
+      console.error((`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`));
+      process.exit(1);
     }
     return schematic.name;
   }

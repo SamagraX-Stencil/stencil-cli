@@ -145,6 +145,6 @@ export class GenerateCommand extends AbstractCommand {
   private async getSchematics(collection: string): Promise<Schematic[]> {
     const abstractCollection: AbstractCollection =
       CollectionFactory.create(collection);
-    return abstractCollection.getSchematics();
+    return abstractCollection.getSchematics('schematic');
   }
 }

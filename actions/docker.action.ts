@@ -18,7 +18,7 @@ export class DockerAction extends AbstractAction {
     schematicOptions.push(
       new SchematicOption('language', 'ts'),
     );
-    await collection.execute(commandInputs[0].value as string, schematicOptions);
+    await collection.execute(commandInputs[0].value as string, schematicOptions,'docker');
 
   }
   private mapSchematicOptions = (inputs: Input[]): SchematicOption[] => {
