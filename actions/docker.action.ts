@@ -5,6 +5,7 @@ import {
 import { AbstractCollection, Collection, CollectionFactory, SchematicOption,} from '../lib/schematics';
 import { AbstractAction } from './abstract.action';
 import { Input } from '../commands';
+import * as chalk from 'chalk';
 
 export class DockerAction extends AbstractAction {
   private manager!: AbstractPackageManager;
@@ -18,8 +19,13 @@ export class DockerAction extends AbstractAction {
     schematicOptions.push(
       new SchematicOption('language', 'ts'),
     );
+    try {
     await collection.execute(commandInputs[0].value as string, schematicOptions,'docker');
-
+    }catch(error){
+      if (error && error.message) {
+      console.error(chalk.red(error.message));
+      }
+    }
   }
   private mapSchematicOptions = (inputs: Input[]): SchematicOption[] => {
   const excludedInputNames = ['schematic', 'spec', 'flat', 'specFileSuffix'];

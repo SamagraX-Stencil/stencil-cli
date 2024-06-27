@@ -227,10 +227,9 @@ export class NestCollection extends AbstractCollection {
     const schematic = (type === 'schematic' ? NestCollection.schematics : NestCollection.docker)
       .find((s) => s.name === name || s.alias === name);
     if (!schematic) {
-      console.error(chalk.red(`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`));
       const collection = await getCollection();
       console.info(buildSchematicsListAsTable(await getSchematics(collection, type)));
-      process.exit(1);
+      throw new Error(`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`);
     }
     return schematic.name;
   }
