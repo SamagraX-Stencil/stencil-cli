@@ -36,6 +36,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
         expect(existsSync(dockerFolder)).toBe(true);
         rmSync(dockerFolder, { recursive: true, force: true });
       });
+      rmSync(join(process.cwd(), 'docker'), { recursive: true, force: true });
 
       child.kill();
       done();
