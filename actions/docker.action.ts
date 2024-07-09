@@ -9,7 +9,7 @@ import * as chalk from 'chalk';
 
 export class DockerAction extends AbstractAction {
   private manager!: AbstractPackageManager;
-  public async handle(commandInputs: Input[]) {
+  public async handle(commandInputs: Input[],options: Input[]) {
     this.manager = await PackageManagerFactory.find();
     
     const collection: AbstractCollection = CollectionFactory.create(
@@ -19,6 +19,8 @@ export class DockerAction extends AbstractAction {
     schematicOptions.push(
       new SchematicOption('language', 'ts'),
     );
+    const path = options.find((option) => option.name === 'path')!.value as string;
+    schematicOptions.push(new SchematicOption('path', path));
     try {
     await collection.execute(commandInputs[0].value as string, schematicOptions,'docker');
     }catch(error){
@@ -28,7 +30,7 @@ export class DockerAction extends AbstractAction {
     }
   }
   private mapSchematicOptions = (inputs: Input[]): SchematicOption[] => {
-  const excludedInputNames = ['schematic', 'spec', 'flat', 'specFileSuffix'];
+  const excludedInputNames = ['path','schematic', 'spec', 'flat', 'specFileSuffix'];
   const options: SchematicOption[] = [];
   inputs.forEach((input) => {
     if (!excludedInputNames.includes(input.name) && input.value !== undefined) {
