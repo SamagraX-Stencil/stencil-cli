@@ -48,6 +48,10 @@ export class NewAction extends AbstractAction {
     const shouldSkipGit = options.some(
       (option) => option.name === 'skip-git' && option.value === true,
     );
+    const shouldSkipDocker = options.some(
+      (option) => option.name === 'skip-docker' && option.value === true,
+    );
+    console.info("ssd",shouldSkipDocker);
 
     const shouldInitializePrima = options.some(
       (option) => option.name === 'prisma' && option.value === 'yes',
@@ -127,6 +131,7 @@ export class NewAction extends AbstractAction {
       isDryRunEnabled as boolean,
       projectDirectory,
       shouldInitializeTemporal as boolean,
+      shouldSkipDocker as boolean,
     );
 
     await createLogging(
@@ -290,7 +295,7 @@ const generateApplicationFiles = async (args: Input[], options: Input[]) => {
   const schematicOptions: SchematicOption[] = mapSchematicOptions(
     args.concat(options),
   );
-  await collection.execute('application', schematicOptions);
+  await collection.execute('application', schematicOptions, 'schematic');
   console.info();
 };
 
@@ -474,6 +479,7 @@ const createTemporal = async (
   dryRunMode: boolean,
   createDirectory: string,
   shouldInitializeTemporal: boolean,
+  shouldSkipDocker : boolean,
 ) => {
   if (!shouldInitializeTemporal) {
     return;
@@ -488,7 +494,7 @@ const createTemporal = async (
 
   const TemporalInstance = new ClassTemporal();
   try {
-    await TemporalInstance.create(createDirectory);
+    await TemporalInstance.create(createDirectory,shouldSkipDocker);
   } catch (error) {
     console.error('could not create the temporal files');
   }

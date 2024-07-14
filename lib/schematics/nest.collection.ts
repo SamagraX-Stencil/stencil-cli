@@ -15,7 +15,7 @@ export interface Docker {
   description: string;
 }
 export class NestCollection extends AbstractCollection {
-  private static schematics: Schematic[] = [
+  public static schematics: Schematic[] = [
     {
       name: 'application',
       alias: 'application',
@@ -167,7 +167,7 @@ export class NestCollection extends AbstractCollection {
       description: 'If you want to have fileUpload setup in the project.',
     },
   ];
-  private static docker: Docker[] = [
+  public static docker: Docker[] = [
     {
       name: 'docker-app',
       alias: 'do-app',
