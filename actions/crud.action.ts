@@ -9,28 +9,39 @@ import { AbstractAction } from './abstract.action';
 import { controllerTemplate } from '../lib/templates/controller-template';
 import { serviceTemplate } from '../lib/templates/service-template';
 import { dtoTemplate } from '../lib/templates/dto-template';
+import { Input } from '../commands/command.input';
 
 export class CrudAction extends AbstractAction {
   private manager!: AbstractPackageManager;
 
-  public async handle() {
+  public async handle(inputs: Input[] = []) {
     this.manager = await PackageManagerFactory.find();
-    await this.generateCrud();
+    await this.generateCrud(inputs);
   }
 
-  private async generateCrud(): Promise<void> {
+  private async generateCrud(inputs: Input[]): Promise<void> {
     try {
       console.info(chalk.green('Generating CRUD API'));
 
       const dmmf = await this.generateDMMFJSON();
       if (dmmf) {
-        this.generateTypes(dmmf);
+        const existingModels = dmmf.datamodel.models.map((model: any) => model.name);
+        
+        if (inputs.length === 0) {
+          inputs = existingModels.map((modelName: any) => ({ name: modelName, value: modelName }));
+        } else {
+          const invalidInputs = inputs.filter(input => !existingModels.includes(input.name));
 
-        this.createAPIs(dmmf);
+          if (invalidInputs.length > 0) {
+            console.error(chalk.red('The following models do not exist:'), invalidInputs.map(input => input.name).join(', '));
+            return;
+          }
+        }
 
-        this.updateAppModule(dmmf);
+        this.generateTypes(dmmf, inputs);
+        this.createAPIs(dmmf, inputs);
+        this.updateAppModule(dmmf, inputs);
       }
-
     } catch (error) {
       console.error(chalk.red('Error generating CRUD API'), error);
     }
@@ -48,9 +59,12 @@ export class CrudAction extends AbstractAction {
     }
   }
 
-  private generateTypes(dmmf: any): void {
+  private generateTypes(dmmf: any, inputs: Input[]): void {
     try {
-      const models = dmmf.datamodel.models;
+      const modelNames = inputs.map(input => input.name);
+      const models = dmmf.datamodel.models.filter((model: any) =>
+        modelNames.includes(model.name)
+      );
 
       models.forEach((model: any) => {
         const interfaceDir = './src/interfaces';
@@ -94,9 +108,12 @@ export class CrudAction extends AbstractAction {
     }
   }
 
-  private createAPIs(dmmf: any): void {
+  private createAPIs(dmmf: any, inputs: Input[]): void {
     try {
-      const models = dmmf.datamodel.models;
+      const modelNames = inputs.map(input => input.name);
+      const models = dmmf.datamodel.models.filter((model: any) =>
+        modelNames.includes(model.name)
+      );
       models.forEach((model: any) => {
         this.createModelAPI(model);
       });
@@ -137,9 +154,12 @@ export class CrudAction extends AbstractAction {
     }
   }
 
-  private updateAppModule(dmmf: any): void {
+  private updateAppModule(dmmf: any, inputs: Input[]): void {
     try {
-      const models = dmmf.datamodel.models;
+      const modelNames = inputs.map(input => input.name);
+      const models = dmmf.datamodel.models.filter((model: any) =>
+        modelNames.includes(model.name)
+      );
       const imports = models.map((model: any) => {
         const controllerImport = `import { ${model.name}Controller } from './controllers/${model.name.toLowerCase()}.controller';`;
         const serviceImport = `import { ${model.name}Service } from './services/${model.name.toLowerCase()}.service';`;
@@ -152,11 +172,14 @@ export class CrudAction extends AbstractAction {
 
       const appModulePath = './src/app.module.ts';
       let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
-
+  
+      const existingImports: string[] = appModuleContent.match(/import {[^}]*} from '[@a-zA-Z0-9\/]*';/g) || [];
+      const newImports: string[] = imports.split('\n').filter((importLine: string) => !existingImports.includes(importLine));
+      
       appModuleContent = appModuleContent.replace(
         /(import {[^}]*} from '[@a-zA-Z0-9\/]*';\n*)+/,
-        `$&${imports}\n`
-      );
+        `$&${newImports.join('\n')}\n`
+      );  
       appModuleContent = appModuleContent.replace(
         /providers: \[\n([^]*)\n\]/,
         `providers: [\n$1\n  ${providers}]`
@@ -166,17 +189,18 @@ export class CrudAction extends AbstractAction {
         /controllers: \[\n([^]*)\n\]/,
         `controllers: [\n$1\n  ${controllers}]`
       );
+      
       const controllersIndex = appModuleContent.indexOf('controllers: [') + 'controllers: ['.length;
       appModuleContent =
         appModuleContent.slice(0, controllersIndex) +
         ` ${controllers},` +
         appModuleContent.slice(controllersIndex);
       const providerIndex = appModuleContent.indexOf('providers: [') + 'providers: ['.length;
-        appModuleContent =
-          appModuleContent.slice(0, providerIndex) +
-          ` ${providers},` +
-          appModuleContent.slice(providerIndex);  
-
+      appModuleContent =
+        appModuleContent.slice(0, providerIndex) +
+        ` ${providers},` +
+        appModuleContent.slice(providerIndex);  
+  
       fs.writeFileSync(appModulePath, appModuleContent);
       console.info(chalk.green('app.module.ts updated successfully'));
     } catch (error) {
