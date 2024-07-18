@@ -14,7 +14,7 @@ import { Input } from '../commands/command.input';
 export class CrudAction extends AbstractAction {
   private manager!: AbstractPackageManager;
 
-  public async handle(inputs: Input[] = []) {
+  public async handle(inputs: Input[]) {
     this.manager = await PackageManagerFactory.find();
     await this.generateCrud(inputs);
   }
@@ -26,21 +26,19 @@ export class CrudAction extends AbstractAction {
       const dmmf = await this.generateDMMFJSON();
       if (dmmf) {
         const existingModels = dmmf.datamodel.models.map((model: any) => model.name);
-        
-        if (inputs.length === 0) {
-          inputs = existingModels.map((modelName: any) => ({ name: modelName, value: modelName }));
-        } else {
-          const invalidInputs = inputs.filter(input => !existingModels.includes(input.name));
+        const inputModelNames = inputs.map(input => input.name);
+        const invalidInputs = inputModelNames.filter(name => name !== '*' && !existingModels.includes(name));
 
-          if (invalidInputs.length > 0) {
-            console.error(chalk.red('The following models do not exist:'), invalidInputs.map(input => input.name).join(', '));
-            return;
-          }
+        if (invalidInputs.length > 0) {
+          console.error(chalk.red('The following models do not exist:'), invalidInputs.join(', '));
+          return;
         }
 
-        this.generateTypes(dmmf, inputs);
-        this.createAPIs(dmmf, inputs);
-        this.updateAppModule(dmmf, inputs);
+        const modelsToGenerate = inputModelNames.includes('*') ? existingModels : inputModelNames;
+
+        this.generateTypes(dmmf, modelsToGenerate);
+        this.createAPIs(dmmf, modelsToGenerate);
+        this.updateAppModule(dmmf, modelsToGenerate);
       }
     } catch (error) {
       console.error(chalk.red('Error generating CRUD API'), error);
@@ -59,25 +57,25 @@ export class CrudAction extends AbstractAction {
     }
   }
 
-  private generateTypes(dmmf: any, inputs: Input[]): void {
+  private generateTypes(dmmf: any, modelNames: string[]): void {
     try {
-      const modelNames = inputs.map(input => input.name);
       const models = dmmf.datamodel.models.filter((model: any) =>
         modelNames.includes(model.name)
       );
 
       models.forEach((model: any) => {
-        const interfaceDir = './src/interfaces';
-        const dtoDir = './src/dto';
-        if (!fs.existsSync(interfaceDir)) {
-          fs.mkdirSync(interfaceDir, { recursive: true });
+        const modelDir = `./src/${model.name.toLowerCase()}`;
+        const dtoDir = `${modelDir}/dto`;
+
+        if (!fs.existsSync(modelDir)) {
+          fs.mkdirSync(modelDir, { recursive: true });
         }
         if (!fs.existsSync(dtoDir)) {
           fs.mkdirSync(dtoDir, { recursive: true });
         }
 
         const interfaceContent = this.interfaceTemplate(model);
-        fs.writeFileSync(`${interfaceDir}/${model.name.toLowerCase()}.interface.ts`, interfaceContent);
+        fs.writeFileSync(`${modelDir}/${model.name.toLowerCase()}.interface.ts`, interfaceContent);
 
         const dtoContent = dtoTemplate(model);
         fs.writeFileSync(`${dtoDir}/${model.name.toLowerCase()}.dto.ts`, dtoContent);
@@ -103,14 +101,13 @@ export class CrudAction extends AbstractAction {
       case 'String': return 'string';
       case 'Boolean': return 'boolean';
       case 'DateTime': return 'Date';
-      case 'Json': return 'any';  
+      case 'Json': return 'any';
       default: return 'any';
     }
   }
 
-  private createAPIs(dmmf: any, inputs: Input[]): void {
+  private createAPIs(dmmf: any, modelNames: string[]): void {
     try {
-      const modelNames = inputs.map(input => input.name);
       const models = dmmf.datamodel.models.filter((model: any) =>
         modelNames.includes(model.name)
       );
@@ -124,18 +121,10 @@ export class CrudAction extends AbstractAction {
   }
 
   private createModelAPI(model: any): void {
-    const controllerDir = `./src/controllers`;
-    const serviceDir = `./src/services`;
+    const modelDir = `./src/${model.name.toLowerCase()}`;
 
-    if (!fs.existsSync(controllerDir)) {
-      fs.mkdirSync(controllerDir, { recursive: true });
-    }
-    if (!fs.existsSync(serviceDir)) {
-      fs.mkdirSync(serviceDir, { recursive: true });
-    }
-
-    const controllerPath = `${controllerDir}/${model.name.toLowerCase()}.controller.ts`;
-    const servicePath = `${serviceDir}/${model.name.toLowerCase()}.service.ts`;
+    const controllerPath = `${modelDir}/${model.name.toLowerCase()}.controller.ts`;
+    const servicePath = `${modelDir}/${model.name.toLowerCase()}.service.ts`;
 
     if (!fs.existsSync(controllerPath)) {
       const controllerContent = controllerTemplate(model);
@@ -154,53 +143,59 @@ export class CrudAction extends AbstractAction {
     }
   }
 
-  private updateAppModule(dmmf: any, inputs: Input[]): void {
+  private updateAppModule(dmmf: any, modelNames: string[]): void {
     try {
-      const modelNames = inputs.map(input => input.name);
       const models = dmmf.datamodel.models.filter((model: any) =>
         modelNames.includes(model.name)
       );
-      const imports = models.map((model: any) => {
-        const controllerImport = `import { ${model.name}Controller } from './controllers/${model.name.toLowerCase()}.controller';`;
-        const serviceImport = `import { ${model.name}Service } from './services/${model.name.toLowerCase()}.service';`;
+      const newImports = models.map((model: any) => {
+        const controllerImport = `import { ${model.name}Controller } from './${model.name.toLowerCase()}/${model.name.toLowerCase()}.controller';`;
+        const serviceImport = `import { ${model.name}Service } from './${model.name.toLowerCase()}/${model.name.toLowerCase()}.service';`;
 
         return `${serviceImport}\n${controllerImport}`;
       }).join('\n');
 
-      const controllers = models.map((model: any) => `${model.name}Controller`).join(',\n  ');
-      const providers = models.map((model: any) => `${model.name}Service`).join(',\n  ');
+      const newControllers = models.map((model: any) => `${model.name}Controller`);
+      const newProviders = models.map((model: any) => `${model.name}Service`);
 
       const appModulePath = './src/app.module.ts';
       let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
-  
-      const existingImports: string[] = appModuleContent.match(/import {[^}]*} from '[@a-zA-Z0-9\/]*';/g) || [];
-      const newImports: string[] = imports.split('\n').filter((importLine: string) => !existingImports.includes(importLine));
-      
+
+      // Avoid duplicate imports
+      const importRegex = /import {[^}]*} from '[@a-zA-Z0-9\/]*';/g;
+      const existingImports: string[] = appModuleContent.match(importRegex) || [];
+      const uniqueNewImports = newImports.split('\n').filter((importLine: string) => !existingImports.some(existingImport => existingImport === importLine)).join('\n');
+
+      if (uniqueNewImports) {
+        appModuleContent = appModuleContent.replace(
+          /(import {[^}]*} from '[@a-zA-Z0-9\/]*';\n*)+/,
+          `$&${uniqueNewImports}\n`
+        );
+      }
+
+      // Update controllers and providers arrays
+      const controllersRegex = /controllers: \[([^\]]*)\]/s;
+      const providersRegex = /providers: \[([^\]]*)\]/s;
+
+      const controllersMatch = appModuleContent.match(controllersRegex);
+      const providersMatch = appModuleContent.match(providersRegex);
+
+      const currentControllers = controllersMatch ? controllersMatch[1].split(',').map(controller => controller.trim()).filter(Boolean) : [];
+      const currentProviders = providersMatch ? providersMatch[1].split(',').map(provider => provider.trim()).filter(Boolean) : [];
+
+      const updatedControllers = Array.from(new Set([...currentControllers, ...newControllers])).join(', ');
+      const updatedProviders = Array.from(new Set([...currentProviders, ...newProviders])).join(', ');
+
       appModuleContent = appModuleContent.replace(
-        /(import {[^}]*} from '[@a-zA-Z0-9\/]*';\n*)+/,
-        `$&${newImports.join('\n')}\n`
-      );  
-      appModuleContent = appModuleContent.replace(
-        /providers: \[\n([^]*)\n\]/,
-        `providers: [\n$1\n  ${providers}]`
+        controllersRegex,
+        `controllers: [${updatedControllers}]`
       );
 
       appModuleContent = appModuleContent.replace(
-        /controllers: \[\n([^]*)\n\]/,
-        `controllers: [\n$1\n  ${controllers}]`
+        providersRegex,
+        `providers: [${updatedProviders}]`
       );
-      
-      const controllersIndex = appModuleContent.indexOf('controllers: [') + 'controllers: ['.length;
-      appModuleContent =
-        appModuleContent.slice(0, controllersIndex) +
-        ` ${controllers},` +
-        appModuleContent.slice(controllersIndex);
-      const providerIndex = appModuleContent.indexOf('providers: [') + 'providers: ['.length;
-      appModuleContent =
-        appModuleContent.slice(0, providerIndex) +
-        ` ${providers},` +
-        appModuleContent.slice(providerIndex);  
-  
+
       fs.writeFileSync(appModulePath, appModuleContent);
       console.info(chalk.green('app.module.ts updated successfully'));
     } catch (error) {

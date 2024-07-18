@@ -1,8 +1,8 @@
 export const serviceTemplate = (model: any): string => `
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { ${model.name} } from '../interfaces/${model.name.toLowerCase()}.interface';
-import { Create${model.name}Dto, Update${model.name}Dto } from '../dto/${model.name.toLowerCase()}.dto';
+import { ${model.name} } from './${model.name.toLowerCase()}.interface';
+import { Create${model.name}Dto, Update${model.name}Dto } from './dto/${model.name.toLowerCase()}.dto';
 
 @Injectable()
 export class ${model.name}Service {
