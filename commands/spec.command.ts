@@ -5,7 +5,7 @@ import { SpecAction } from '../actions';
 export class SpecCommand extends AbstractCommand{
   public load(program: CommanderStatic) {
     program
-      .command('spec <filePath>')
+      .command('spec [filePath]')
       .alias('sp')
       .description('Generate Project Based on Spec file')
       .action(async (filePath: string) => {
