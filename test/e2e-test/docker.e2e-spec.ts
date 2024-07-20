@@ -118,12 +118,10 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
       done();
     });
   },10000 );
-  
-
-it('should skip the docker files when --skip-docker flag is used', (done) => {
-    exec(`npx stencil new service1 --ps no --us no --mo no --te yes --fu no --package-manager npm  --skip-docker`, (error, stdout, stderr) => {
+  it('should not skip the docker files when --skip-docker flag is not used', (done) => {
+    exec(`npx stencil new service1 --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
       const serviceDir = join(process.cwd(), 'service1');
-      const dockerDir = join(serviceDir, 'docker');
+      const dockerDir = join(serviceDir, 'services');
 
       expect(existsSync(serviceDir)).toBe(true);
 
@@ -132,20 +130,21 @@ it('should skip the docker files when --skip-docker flag is used', (done) => {
 
       done();
     });
-  },100000);
+  },50000);
 
-  it('should not skip the docker files when --skip-docker flag is not used', (done) => {
-    exec(`npx stencil new service2 --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
+
+it('should skip the docker files when --skip-docker flag is used', (done) => {
+    exec(`npx stencil new service2 --skip-docker --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
       const serviceDir = join(process.cwd(), 'service2');
       const dockerDir = join(serviceDir, 'services');
 
       expect(existsSync(serviceDir)).toBe(true);
 
-      expect(existsSync(dockerDir)).toBe(true);
+      expect(existsSync(dockerDir)).toBe(false);
       rmSync(join(process.cwd(), 'service2'), { recursive: true, force: true });
-
 
       done();
     });
-  },100000);
+  },50000);
+
 });
