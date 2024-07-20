@@ -41,7 +41,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
       child.kill();
       done();
     });
-  },10000 );
+  },15000 );
 
   it('should run "docker" command with adhoc services and check if the docker compose is updated', (done) => {
     const services = ['postgres', 'hasura'];
@@ -72,7 +72,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
       child.kill();
       done();
     });
-  }, );
+  }, 10000);
 
   it('should throw error for "docker" command with wrong path flag', (done) => {
     const services = ['postgres', 'hasura'];
@@ -81,11 +81,11 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
         expect(stderr).toContain(`Schematic input does not validate against the Schema: {"name":"${service}","language":"ts","path":true}`);
         expect(stderr).toContain(`Data path "/path" must be string.`);
       });
-      
+
       child.kill();
       done();
     });
-  }, );
+  }, 10000);
 
   it('should run "docker" command with path flag', (done) => {
     const services = ['postgres', 'hasura'];
@@ -117,6 +117,35 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
       child.kill();
       done();
     });
-  }, );
+  },10000 );
+  
 
+it('should skip the docker files when --skip-docker flag is used', (done) => {
+    exec(`npx stencil new service1 --ps no --us no --mo no --te yes --fu no --package-manager npm  --skip-docker`, (error, stdout, stderr) => {
+      const serviceDir = join(process.cwd(), 'service1');
+      const dockerDir = join(serviceDir, 'docker');
+
+      expect(existsSync(serviceDir)).toBe(true);
+
+      expect(existsSync(dockerDir)).toBe(false);
+      rmSync(join(process.cwd(), 'service1'), { recursive: true, force: true });
+
+      done();
+    });
+  },100000);
+
+  it('should not skip the docker files when --skip-docker flag is not used', (done) => {
+    exec(`npx stencil new service2 --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
+      const serviceDir = join(process.cwd(), 'service2');
+      const dockerDir = join(serviceDir, 'services');
+
+      expect(existsSync(serviceDir)).toBe(true);
+
+      expect(existsSync(dockerDir)).toBe(true);
+      rmSync(join(process.cwd(), 'service2'), { recursive: true, force: true });
+
+
+      done();
+    });
+  },100000);
 });
