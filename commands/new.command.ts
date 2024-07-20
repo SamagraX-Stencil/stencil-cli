@@ -50,16 +50,8 @@ export class NewCommand extends AbstractCommand {
         'If you want to have monitoring setup in the project',
       )
       .option(
-        '--ms, --monitoringService [monitoringService]',
-        'If you want to have monitoring-service setup in the project',
-      )
-      .option(
         '--te, --temporal [temporal]',
         'If you want to have temporal setup in the project',
-      )
-      .option(
-        '--lg, --logging [logging]',
-        'If you want to have logging setup in the project',
       )
       .option(
         '--fu, --fileUpload [fileUpload]',
@@ -83,12 +75,7 @@ export class NewCommand extends AbstractCommand {
         options.push({ name: 'userService', value: command.userService });
         options.push({ name: 'fixtures', value: command.fixtures });
         options.push({ name: 'monitoring', value: command.monitoring });
-        options.push({
-          name: 'monitoringService',
-          value: command.monitoringService,
-        });
         options.push({ name: 'temporal', value: command.temporal });
-        options.push({ name: 'logging', value: command.logging });
         options.push({ name: 'fileUpload', value: command.fileUpload });
 
         if (!!command.language) {
