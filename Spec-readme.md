@@ -32,6 +32,7 @@ endpoints:
 ```
 
 *Supported Package Managers are npm, yarn, pnpm and bun.*
+
 *Supported toolings are prisma, userService, temporal, monitoring, monitoringService, logging, fileUpload*
 
 
