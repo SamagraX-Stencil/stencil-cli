@@ -161,7 +161,6 @@ export class CrudAction extends AbstractAction {
       const appModulePath = './src/app.module.ts';
       let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
 
-      // Avoid duplicate imports
       const importRegex = /import {[^}]*} from '[@a-zA-Z0-9\/]*';/g;
       const existingImports: string[] = appModuleContent.match(importRegex) || [];
       const uniqueNewImports = newImports.split('\n').filter((importLine: string) => !existingImports.some(existingImport => existingImport === importLine)).join('\n');
@@ -173,7 +172,6 @@ export class CrudAction extends AbstractAction {
         );
       }
 
-      // Update controllers and providers arrays
       const controllersRegex = /controllers: \[([^\]]*)\]/s;
       const providersRegex = /providers: \[([^\]]*)\]/s;
 

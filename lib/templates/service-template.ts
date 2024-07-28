@@ -38,8 +38,13 @@ export class ${modelName}Service {
     return this.${modelNameLowerCase}s[${modelNameLowerCase}Index];
   }
 
-  async remove(id: number): Promise<void> {
-    this.${modelNameLowerCase}s = this.${modelNameLowerCase}s.filter(${modelNameLowerCase} => ${modelNameLowerCase}.id !== id);
+  async remove(id: number): Promise<boolean> {
+    const ${modelNameLowerCase}Index = this.${modelNameLowerCase}s.findIndex(${modelNameLowerCase} => ${modelNameLowerCase}.id === id);
+    if(${modelNameLowerCase}Index === -1) {
+        return false;
+    }
+    this.${modelNameLowerCase}s.splice(${modelNameLowerCase}Index, 1);
+    return true;
   }
 }
 `;

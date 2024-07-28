@@ -3,7 +3,7 @@ export function controllerTemplate(model: any): string {
   const modelNameLowerCase = modelName.toLowerCase();
 
   const swaggerImports = `
-import { Controller, Get, Param, Post, Body, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Post, Body, Put, Delete, NotFoundException } from '@nestjs/common';
 import { ${modelName}Service } from './${modelNameLowerCase}.service';
 import { Create${modelName}Dto, Update${modelName}Dto } from './dto/${modelNameLowerCase}.dto';
 import { ${modelName} } from './${modelNameLowerCase}.interface';
@@ -20,8 +20,13 @@ export class ${modelName}Controller {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: number): Promise<${modelName} | undefined> {
-    return this.${modelNameLowerCase}Service.findOne(id);
+  async findOne(@Param('id') id: string): Promise<${modelName}> {
+    const ${modelNameLowerCase}Id = parseInt(id, 10);
+    const ${modelNameLowerCase} = await this.${modelNameLowerCase}Service.findOne(${modelNameLowerCase}Id);
+    if (!${modelNameLowerCase}) {
+      throw new NotFoundException(\`${modelName} with ID \${id} not found\`);
+    }
+    return ${modelNameLowerCase};
   }
 
   @Post()
@@ -30,13 +35,22 @@ export class ${modelName}Controller {
   }
 
   @Put(':id')
-  async update(@Param('id') id: number, @Body() ${modelNameLowerCase}Dto: Update${modelName}Dto): Promise<${modelName} | undefined> {
-    return this.${modelNameLowerCase}Service.update(id, ${modelNameLowerCase}Dto);
+  async update(@Param('id') id: string, @Body() ${modelNameLowerCase}Dto: Update${modelName}Dto): Promise<${modelName}> {
+    const ${modelNameLowerCase}Id = parseInt(id, 10);
+    const updated${modelName} = await this.${modelNameLowerCase}Service.update(${modelNameLowerCase}Id, ${modelNameLowerCase}Dto);
+    if (!updated${modelName}) {
+      throw new NotFoundException(\`${modelName} with ID \${id} not found\`);
+    }
+    return updated${modelName};
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<void> {
-    return this.${modelNameLowerCase}Service.remove(id);
+  async remove(@Param('id') id: string): Promise<void> {
+    const ${modelNameLowerCase}Id = parseInt(id, 10);
+    const result = await this.${modelNameLowerCase}Service.remove(${modelNameLowerCase}Id);
+    if (!result) {
+      throw new NotFoundException(\`${modelName} with ID \${id} not found\`);
+    }
   }
 }
 `;
