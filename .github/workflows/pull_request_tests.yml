@@ -2,7 +2,7 @@ name: Pull Request Tests
 
 on:
   pull_request:
-    branches: [master]
+    branches: [master, develop, release/*]
 
 jobs:
   test:
@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
 
     - name: Set up Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -26,13 +26,12 @@ jobs:
 
     - name: Run tests
       run: npm test
-      continue-on-error: true
 
     - name: Generate coverage report
       run: npm run coverage
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: coverage/
