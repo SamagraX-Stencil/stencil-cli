@@ -12,6 +12,8 @@ import {
 } from '../lib/package-managers';
 import { BANNER, MESSAGES } from '../lib/ui';
 import { AbstractAction } from './abstract.action';
+import { Input } from '../commands';
+import { Path } from 'typescript';
 
 interface StencilSpec {
   stencil: string;
@@ -33,23 +35,34 @@ const spinner = ora({
 });
 export class SpecAction extends AbstractAction {
   private manager!: AbstractPackageManager;
-  constructor(private specFilePath: string = 'spec.yaml') {
-    super();
-  }
+  // constructor(private specFilePath: string) {
+  //   super();
+  // }
 
-  public async handle() {
-    spinner.start();
+  public async handle(inputs: Input[]) {
     this.manager = await PackageManagerFactory.find();
-    await this.loadSpec();
+    await this.loadSpec(inputs);
     spinner.stop();
   }
-  private async loadSpec(): Promise<void> {
-    const stencilFilePath = join(process.cwd(), this.specFilePath);
+  private async loadSpec(inputs: Input[]): Promise<void> {
+    const specFilePath = inputs.find((option) => option.name === 'filePath');
+    if (!specFilePath) {
+      console.error(MESSAGES.NO_SPEC_PATH_FOUND);
+      return;
+    }     
+    const specFilePathValue = specFilePath.value as Path;
+
+    if (!specFilePathValue.endsWith('.yaml')) {
+      console.error(MESSAGES.INVALID_SPECFILE_EXTENSION);
+      return;
+    }
+    
+    const stencilFilePath = join(process.cwd(),specFilePathValue as Path);
     try {
       const stencilFileContent = await fs.promises.readFile(stencilFilePath, 'utf-8');
-      
+      console.log(stencilFileContent);
       if (stencilFileContent.trim() === '') {
-        console.info(chalk.yellow(MESSAGES.NO_SPEC_FOUND));
+        console.error(chalk.red(MESSAGES.EMPTY_SPEC_FOUND));
         return;
       } 
 
@@ -89,11 +102,16 @@ export class SpecAction extends AbstractAction {
       await this.runCommand(command);
       console.info('\n');
       } catch (error) {
-      console.error(chalk.red(MESSAGES.ERROR_READING_SPEC), error);
+        if (error.code === 'ENOENT') {
+          console.error(`File not found: ${specFilePathValue}`);
+        } else {
+          console.error(chalk.red(MESSAGES.ERROR_READING_SPEC));
+        }      
     }
   }
 
   private runCommand(command: string): Promise<void> {
+    spinner.start();
     return new Promise((resolve, reject) => {
       exec(command, (error, stdout, stderr) => {
         console.info('\n');
