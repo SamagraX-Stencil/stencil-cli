@@ -30,6 +30,7 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
+import path = require('path');
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -683,8 +684,12 @@ const createRegistry = async (
     if (setupInfo.loggingSetup) tooling.push('logging');
     if (setupInfo.fileUploadSetup) tooling.push('fileUpload');
 
+    const packageJsonPath = path.join(projectDirectory, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    const stencilVersion = packageJson.dependencies['@samagra-x/stencil-cli'] || packageJson.devDependencies['@samagra-x/stencil-cli'];
+
     const yamlContent = yaml.dump({
-      stencil: '0.0.1',
+      stencil: stencilVersion,
       info: {
         properties: {
           'project-name': projectName,
