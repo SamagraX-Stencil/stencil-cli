@@ -196,7 +196,17 @@ export class NestCollection extends AbstractCollection {
     {
       name: 'hasura',
       alias: 'hs',
-      description: 'Generate a docker compose for hasura.',
+      description: 'Generate a docker compose for hasura',
+    },
+    {
+      name: 'minio',
+      alias: 'mi',
+      description: 'Generate a docker compose for minio',
+    },
+    {
+      name: 'fusionauth',
+      alias: 'fa',
+      description: 'Generate a docker compose for fusionauth',
     },
   ];
   constructor(runner: AbstractRunner) {
