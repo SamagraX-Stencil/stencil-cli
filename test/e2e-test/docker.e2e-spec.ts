@@ -5,7 +5,7 @@ import * as yaml from 'js-yaml';
 
 describe('Stencil cli e2e Test - DOCKER command', () => {
   it('should run the Stencil CLI with the "docker" command and log the output', (done) => {
-    exec('npx stencil docker', (error, stdout, stderr) => {
+    exec('stencil docker', (error, stdout, stderr) => {
       expect(stderr).toContain("missing required argument 'services'");
       done();
     });
@@ -13,7 +13,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
   it('should throw error for invalid "docker" command and log the output', (done) => {
     const service = 'service1';
-    exec(`npx stencil docker ${service}`, (error, stdout, stderr) => {
+    exec(`stencil docker ${service}`, (error, stdout, stderr) => {
       expect(stdout).toContain('');
       expect(stderr).toContain(`Invalid schematic "${service}". Please, ensure that "${service}" exists in this collection.`);
       done();
@@ -22,7 +22,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
   it('should run "docker" command with tooling services and check if the folder is generated', (done) => {
     const services = ['monitoringService', 'logging', 'temporal'];
-    const child = exec(`npx stencil docker ${services.join(' ')}`, (error, stdout, stderr) => {
+    const child = exec(`stencil docker ${services.join(' ')}`, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         child.kill();
@@ -45,7 +45,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
   it('should run "docker" command with adhoc services and check if the docker compose is updated', (done) => {
     const services = ['postgres', 'hasura'];
-    const child = exec(`npx stencil docker ${services.join(' ')}`, (error, stdout, stderr) => {
+    const child = exec(`stencil docker ${services.join(' ')}`, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         child.kill();
@@ -76,7 +76,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
   it('should throw error for "docker" command with wrong path flag', (done) => {
     const services = ['postgres', 'hasura'];
-    const child = exec(`npx stencil docker ${services.join(' ')} --path`, (error, stdout, stderr) => {
+    const child = exec(`stencil docker ${services.join(' ')} --path`, (error, stdout, stderr) => {
       services.forEach((service) => {
         expect(stderr).toContain(`Schematic input does not validate against the Schema: {"name":"${service}","language":"ts","path":true}`);
         expect(stderr).toContain(`Data path "/path" must be string.`);
@@ -89,7 +89,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
   it('should run "docker" command with path flag', (done) => {
     const services = ['postgres', 'hasura'];
-    const child = exec(`npx stencil docker ${services.join(' ')} --path temp`, (error, stdout, stderr) => {
+    const child = exec(`stencil docker ${services.join(' ')} --path temp`, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
         child.kill();
@@ -119,7 +119,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
     });
   },10000 );
   it('should not skip the docker files when --skip-docker flag is not used', (done) => {
-    exec(`npx stencil new service1 --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
+    exec(`stencil new service1 --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
       const serviceDir = join(process.cwd(), 'service1');
       const dockerDir = join(serviceDir, 'services');
 
@@ -134,7 +134,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
 
 it('should skip the docker files when --skip-docker flag is used', (done) => {
-    exec(`npx stencil new service2 --skip-docker --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
+    exec(`stencil new service2 --skip-docker --ps no --us no --mo no --te yes --fu no --package-manager npm`, (error, stdout, stderr) => {
       const serviceDir = join(process.cwd(), 'service2');
       const dockerDir = join(serviceDir, 'services');
 
