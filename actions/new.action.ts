@@ -72,9 +72,6 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'temporal' && option.value === 'yes',
     );
 
-    // const shouldInitializeLogging = options.some(
-    //   (option) => option.name === 'logging' && option.value === 'yes',
-    // );
 
     const shouldInitializeFileUpload = options.some(
       (option) => option.name === 'fileUpload' && option.value === 'yes',
@@ -123,11 +120,6 @@ export class NewAction extends AbstractAction {
       shouldSkipDocker as boolean,
     );
 
-    // await createLogging(
-    //   isDryRunEnabled as boolean,
-    //   projectDirectory,
-    //   shouldInitializeLogging as boolean,
-    // );
 
     await createFileUpload(
       isDryRunEnabled as boolean,
@@ -170,14 +162,10 @@ const getFixturesInput = (inputs: Input[]) =>
 const getMonitoringInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'monitoring');
 
-// const getMonitoringServiceInput = (inputs: Input[]) =>
-//   inputs.find((options) => options.name === 'monitoringService');
 
 const getTemporalInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'temporal');
 
-// const getLoggingInput = (inputs: Input[]) =>
-//   inputs.find((options) => options.name === 'logging');
 
 const getFileUploadInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'fileUpload');
@@ -232,23 +220,12 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     replaceInputMissingInformation(options, answers);
   }
 
-  // const monitoringServiceInput = getMonitoringServiceInput(options);
-  // if (!monitoringServiceInput!.value) {
-  //   const answers = await askForMonitoringService();
-  //   replaceInputMissingInformation(options, answers);
-  // }
 
   const temporalInput = getTemporalInput(options);
   if (!temporalInput!.value) {
     const answers = await askForTemporal();
     replaceInputMissingInformation(options, answers);
   }
-
-  // const loggingInput = getLoggingInput(options);
-  // if (!loggingInput!.value) {
-  //   const answers = await askForLogging();
-  //   replaceInputMissingInformation(options, answers);
-  // }
 
   const fileUploadInput = getFileUploadInput(options);
   if (!fileUploadInput!.value) {
@@ -465,29 +442,6 @@ const createTemporal = async (
   }
 };
 
-// const createLogging = async (
-//   dryRunMode: boolean,
-//   createDirectory: string,
-//   shouldInitializeLogging: boolean,
-// ) => {
-//   if (!shouldInitializeLogging) {
-//     return;
-//   }
-
-//   if (dryRunMode) {
-//     console.info();
-//     console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
-//     console.info();
-//     return;
-//   }
-
-//   const LoggingInstance = new ClassLogging();
-//   try {
-//     await LoggingInstance.create(createDirectory);
-//   } catch (error) {
-//     console.error('could not create the logging folder');
-//   }
-// };
 
 const createFileUpload = async (
   dryRunMode: boolean,
@@ -563,16 +517,6 @@ const askForMonitoring = async (): Promise<Answers> => {
   return await prompt(questions);
 };
 
-const askForMonitoringService = async (): Promise<Answers> => {
-  const questions: Question[] = [
-    generateSelect('monitoringService')(MESSAGES.MONITORING_SERVICE_QUESTION)([
-      'yes',
-      'no',
-    ]),
-  ];
-  const prompt = inquirer.createPromptModule();
-  return await prompt(questions);
-};
 
 const askForTemporal = async (): Promise<Answers> => {
   const questions: Question[] = [
@@ -581,14 +525,6 @@ const askForTemporal = async (): Promise<Answers> => {
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
 };
-
-// const askForLogging = async (): Promise<Answers> => {
-//   const questions: Question[] = [
-//     generateSelect('logging')(MESSAGES.LOGGING_QUESTION)(['yes', 'no']),
-//   ];
-//   const prompt = inquirer.createPromptModule();
-//   return await prompt(questions);
-// };
 
 const askForFileUpload = async (): Promise<Answers> => {
   const questions: Question[] = [
