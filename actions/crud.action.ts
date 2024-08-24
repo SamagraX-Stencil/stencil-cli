@@ -148,23 +148,15 @@ export class CrudAction extends AbstractAction {
       const models = dmmf.datamodel.models.filter((model: any) =>
         modelNames.includes(model.name)
       );
+      const appModulePath = './src/app.module.ts';
+      let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
       const newImports = models.map((model: any) => {
         const controllerImport = `import { ${model.name}Controller } from './${model.name.toLowerCase()}/${model.name.toLowerCase()}.controller';`;
         const serviceImport = `import { ${model.name}Service } from './${model.name.toLowerCase()}/${model.name.toLowerCase()}.service';`;
 
         return `${serviceImport}\n${controllerImport}`;
-      }).join('\n');
-
-      const newControllers = models.map((model: any) => `${model.name}Controller`);
-      const newProviders = models.map((model: any) => `${model.name}Service`);
-
-      const appModulePath = './src/app.module.ts';
-      let appModuleContent = fs.readFileSync(appModulePath, 'utf-8');
-
-      const importRegex = /import {[^}]*} from '[@a-zA-Z0-9\/]*';/g;
-      const existingImports: string[] = appModuleContent.match(importRegex) || [];
-      const uniqueNewImports = newImports.split('\n').filter((importLine: string) => !existingImports.some(existingImport => existingImport === importLine)).join('\n');
-
+      });
+      const uniqueNewImports = newImports.filter((importLine: string) => !appModuleContent.includes(importLine)).join('\n');
       if (uniqueNewImports) {
         appModuleContent = appModuleContent.replace(
           /(import {[^}]*} from '[@a-zA-Z0-9\/]*';\n*)+/,
@@ -181,6 +173,8 @@ export class CrudAction extends AbstractAction {
       const currentControllers = controllersMatch ? controllersMatch[1].split(',').map(controller => controller.trim()).filter(Boolean) : [];
       const currentProviders = providersMatch ? providersMatch[1].split(',').map(provider => provider.trim()).filter(Boolean) : [];
 
+      const newControllers = models.map((model: any) => `${model.name}Controller`);
+      const newProviders = models.map((model: any) => `${model.name}Service`);
       const updatedControllers = Array.from(new Set([...currentControllers, ...newControllers])).join(', ');
       const updatedProviders = Array.from(new Set([...currentProviders, ...newProviders])).join(', ');
 
