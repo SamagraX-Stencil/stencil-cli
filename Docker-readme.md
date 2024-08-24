@@ -6,7 +6,7 @@ stencil do <services...> [options]
 ```
 **Description**
 
-Creates a docker service/container for given prompt.
+Creates a docker service/container for given command.
 -  Tooling specific setup
     - Creates a folder with the given `<service>` inside docker directory
 - À la Carte setup / Adhoc setup
