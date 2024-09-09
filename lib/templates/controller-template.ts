@@ -14,12 +14,12 @@ import { ${modelName} } from './${modelNameLowerCase}.interface';
 export class ${modelName}Controller {
   constructor(private readonly ${modelNameLowerCase}Service: ${modelName}Service) {}
 
-  @Get()
+@Get()
   async findAll(): Promise<${modelName}[]> {
     return this.${modelNameLowerCase}Service.findAll();
   }
 
-  @Get(':id')
+@Get(':id')
   async findOne(@Param('id') id: string): Promise<${modelName}> {
     const ${modelNameLowerCase}Id = parseInt(id, 10);
     const ${modelNameLowerCase} = await this.${modelNameLowerCase}Service.findOne(${modelNameLowerCase}Id);
@@ -29,12 +29,12 @@ export class ${modelName}Controller {
     return ${modelNameLowerCase};
   }
 
-  @Post()
+@Post()
   async create(@Body() ${modelNameLowerCase}Dto: Create${modelName}Dto): Promise<${modelName}> {
     return this.${modelNameLowerCase}Service.create(${modelNameLowerCase}Dto);
   }
 
-  @Put(':id')
+@Put(':id')
   async update(@Param('id') id: string, @Body() ${modelNameLowerCase}Dto: Update${modelName}Dto): Promise<${modelName}> {
     const ${modelNameLowerCase}Id = parseInt(id, 10);
     const updated${modelName} = await this.${modelNameLowerCase}Service.update(${modelNameLowerCase}Id, ${modelNameLowerCase}Dto);
@@ -44,7 +44,7 @@ export class ${modelName}Controller {
     return updated${modelName};
   }
 
-  @Delete(':id')
+@Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     const ${modelNameLowerCase}Id = parseInt(id, 10);
     const result = await this.${modelNameLowerCase}Service.remove(${modelNameLowerCase}Id);

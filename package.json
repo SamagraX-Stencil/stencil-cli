@@ -40,7 +40,7 @@
     "@angular-devkit/schematics-cli": "16.2.3",
     "@prisma/internals": "^5.16.2",
     "@samagra-x/schematics": "^0.0.5",
-    "bun": "^1.1.7",
+    "bun": "^1.1.26",
     "chalk": "4.1.2",
     "chokidar": "3.5.3",
     "cli-table3": "0.6.3",
