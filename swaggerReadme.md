@@ -4,12 +4,12 @@ The `stencil add swagger` command helps developers to automatically generate Swa
 ## Swagger Command
 
 ```
-stencil add <subcommand> [modelName...] [options]
+stencil add <subcommand> [modelPath] [options]
 
-stencil as <subcommand> [modelName...] [options] 
+stencil as <subcommand> [modelPath] [options] 
 ```
 
-Example: `stencil add swagger modelName` or `stencil as swagger modelName --init`
+Example: `stencil add swagger modelPath` or `stencil as swagger modelPath --init`
 
 **Description**
 
@@ -20,17 +20,9 @@ The Swagger subcommand automates the process of adding Swagger decorators to exi
 
 | Argument  |  Description |
 |-----------|--------------|
-|  `[modelName...]`	 | The model name for which Swagger decorators need to be added
+|  `[modelPath]`	 | The model path for which Swagger decorators need to be added
  |
 
-**Inputs**
-
-| Name  |  Description |
-|---|---|
-|  `modelName`  | Adds Swagger decorators for the specified model's controller and DTO files
- |
-|  `*` | Adds Swagger decorators for all models present in the schema.prisma
-  |
 
 **Options**
 
