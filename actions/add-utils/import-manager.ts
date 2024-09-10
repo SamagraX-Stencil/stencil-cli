@@ -22,9 +22,9 @@ export function addImports(content: string, fileType: 'controller' | 'dto'): str
     if (existingSwaggerImports) {
       content = content.replace(existingSwaggerImports[0], newImportStatement);
     } else {
-      content = content.replace(/import\s+[\w\{\}\s,]*\s+from\s+'@nestjs\/common';/, (match) => {
-        return `${match}\n${newImportStatement}`;
-      });
+      const lastImportIndex = content.lastIndexOf('import ');
+      const insertPosition = content.indexOf(';', lastImportIndex) + 1;
+      content = `${content.slice(0, insertPosition)}\n${newImportStatement}${content.slice(insertPosition)}`;
     }
   }
 

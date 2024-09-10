@@ -5,14 +5,14 @@ import { Input } from './command.input';
 export class AddCommand extends AbstractCommand {
   public load(program: CommanderStatic) {
     program
-      .command('add <subcommand> [controllerPath]')
+      .command('add <subcommand> [modelName]')
       .alias('as')
-      .description('Add various functionalities to the specified controller.')
+      .description('Add various swagger methods to the specified model.')
       .option('--init', 'Initialize with default options')
-      .action(async (subcommand: string, controllerPath: string, options: any) => {
+      .action(async (subcommand: string, modelPath: string, options: any) => {
         const inputs: Input[] = [
           { name: 'subcommand', value: subcommand },
-          { name: 'controllerPath', value: controllerPath }
+          { name: 'modelPath', value: modelPath }
         ];
 
         if (options.init) {
