@@ -23,6 +23,7 @@
     "prepublish:npm": "npm run build",
     "test": "jest --config test/jest-config.json",
     "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
+    "test:e2e": "jest --config test/e2e-test/jest-e2e.json",
     "prerelease": "npm run build",
     "release": "release-it",
     "prepare": "husky install"
@@ -37,8 +38,9 @@
     "@angular-devkit/core": "16.2.3",
     "@angular-devkit/schematics": "16.2.3",
     "@angular-devkit/schematics-cli": "16.2.3",
+    "@prisma/internals": "^5.16.2",
     "@samagra-x/schematics": "^0.0.5",
-    "bun": "^1.0.35",
+    "bun": "^1.1.26",
     "chalk": "4.1.2",
     "chokidar": "3.5.3",
     "cli-table3": "0.6.3",
