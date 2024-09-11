@@ -21,8 +21,6 @@ export class CrudAction extends AbstractAction {
 
   private async generateCrud(inputs: Input[]): Promise<void> {
     try {
-      console.info(chalk.green('Generating CRUD API'));
-
       const dmmf = await this.generateDMMFJSON();
       if (dmmf) {
         const existingModels = dmmf.datamodel.models.map((model: any) => model.name);
@@ -33,7 +31,7 @@ export class CrudAction extends AbstractAction {
           console.error(chalk.red('The following models do not exist:'), invalidInputs.join(', '));
           return;
         }
-
+        console.info(chalk.green('Generating CRUD API'));
         const modelsToGenerate = inputModelNames.includes('*') ? existingModels : inputModelNames;
 
         this.generateTypes(dmmf, modelsToGenerate);
@@ -52,7 +50,7 @@ export class CrudAction extends AbstractAction {
       fs.writeFileSync('./dmmf.json', JSON.stringify(dmmf, null, 2));
       return dmmf;
     } catch (error) {
-      console.error(chalk.red('Error generating DMMF JSON'), error);
+      console.error(chalk.red('Error generating DMMF JSON'));
       return null;
     }
   }
