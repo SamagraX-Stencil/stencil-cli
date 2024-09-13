@@ -88,9 +88,7 @@ export class SpecAction extends AbstractAction {
         { name: 'prisma', flag: 'ps' },
         { name: 'userService', flag: 'us' },
         { name: 'monitoring', flag: 'mo' },
-        { name: 'monitoringService', flag: 'ms' },
         { name: 'temporal', flag: 'te' },
-        { name: 'logging', flag: 'lg' },
         { name: 'fileUpload', flag: 'fu' }
       ];
 

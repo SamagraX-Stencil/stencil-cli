@@ -63,20 +63,12 @@ export class NewAction extends AbstractAction {
       (option) => option.name === 'fixtures' && option.value === 'yes',
     );
 
-    const shouldInstallMonitoring = options.some(
-      (option) => option.name === 'monitoring' && option.value === 'yes',
-    );
-
     const shouldInitializeMonitoring = options.some(
-      (option) => option.name === 'monitoringService' && option.value === 'yes',
+      (option) => option.name === 'monitoring' && option.value === 'yes',
     );
 
     const shouldInitializeTemporal = options.some(
       (option) => option.name === 'temporal' && option.value === 'yes',
-    );
-
-    const shouldInitializeLogging = options.some(
-      (option) => option.name === 'logging' && option.value === 'yes',
     );
 
     const shouldInitializeFileUpload = options.some(
@@ -112,16 +104,9 @@ export class NewAction extends AbstractAction {
       );
     }
 
-    await installMonitoring(
-      isDryRunEnabled as boolean,
-      projectDirectory,
-      shouldInstallMonitoring as boolean,
-    );
-
     await createMonitor(
       isDryRunEnabled as boolean,
       projectDirectory,
-      shouldInstallMonitoring as boolean,
       shouldInitializeMonitoring as boolean,
     );
 
@@ -131,11 +116,11 @@ export class NewAction extends AbstractAction {
       shouldInitializeTemporal as boolean,
     );
 
-    await createLogging(
-      isDryRunEnabled as boolean,
-      projectDirectory,
-      shouldInitializeLogging as boolean,
-    );
+    // await createLogging(
+    //   isDryRunEnabled as boolean,
+    //   projectDirectory,
+    //   shouldInitializeLogging as boolean,
+    // );
 
     await createFileUpload(
       isDryRunEnabled as boolean,
@@ -151,10 +136,8 @@ export class NewAction extends AbstractAction {
           projectName: getApplicationNameInput(inputs)!.value as string,
           prismaSetup: shouldInitializePrima,
           userServiceSetup: shouldInitializeUserService,
-          monitoringSetup: shouldInstallMonitoring,
-          monitoringServicesSetup: shouldInitializeMonitoring,
+          monitoringSetup: shouldInitializeMonitoring,
           temporalSetup: shouldInitializeTemporal,
-          loggingSetup: shouldInitializeLogging,
           fileUploadSetup: shouldInitializeFileUpload,
           packageManager: getPackageManagerInput(options)!.value as string
         });
@@ -188,14 +171,8 @@ const getFixturesInput = (inputs: Input[]) =>
 const getMonitoringInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'monitoring');
 
-const getMonitoringServiceInput = (inputs: Input[]) =>
-  inputs.find((options) => options.name === 'monitoringService');
-
 const getTemporalInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'temporal');
-
-const getLoggingInput = (inputs: Input[]) =>
-  inputs.find((options) => options.name === 'logging');
 
 const getFileUploadInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'fileUpload');
@@ -243,9 +220,7 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
   // await handleInput(getFixturesInput, askForFixtures, options);
   
   await handleInput(getMonitoringInput, askForMonitoring, options);
-  await handleInput(getMonitoringServiceInput, askForMonitoringService, options);
   await handleInput(getTemporalInput, askForTemporal, options);
-  await handleInput(getLoggingInput, askForLogging, options);
   await handleInput(getFileUploadInput, askForFileUpload, options);
   await handleInput(getPackageManagerInput, askForPackageManager, options);
 };
@@ -402,37 +377,13 @@ const createFixtures = async (
   }
 };
 
-const installMonitoring = async (
-  dryRunMode: boolean,
-  createDirectory: string,
-  shouldInstallMonitoring: boolean,
-) => {
-  if (!shouldInstallMonitoring) {
-    return;
-  }
-
-  if (dryRunMode) {
-    console.info();
-    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
-    console.info();
-    return;
-  }
-
-  const MonitoringInstance = new ClassMonitoring();
-  try {
-    await MonitoringInstance.addImport(createDirectory);
-  } catch (error) {
-    console.error('could not modify the app.module with monitoring');
-  }
-};
 
 const createMonitor = async (
   dryRunMode: boolean,
   createDirectory: string,
-  shouldInstallMonitoring: boolean,
   shouldInitializeMonitoring: boolean,
 ) => {
-  if (!shouldInstallMonitoring || !shouldInitializeMonitoring) {
+  if ( !shouldInitializeMonitoring) {
     return;
   }
 
@@ -573,28 +524,9 @@ const askForMonitoring = async (): Promise<Answers> => {
   return await prompt(questions);
 };
 
-const askForMonitoringService = async (): Promise<Answers> => {
-  const questions: Question[] = [
-    generateSelect('monitoringService')(MESSAGES.MONITORING_SERVICE_QUESTION)([
-      'yes',
-      'no',
-    ]),
-  ];
-  const prompt = inquirer.createPromptModule();
-  return await prompt(questions);
-};
-
 const askForTemporal = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('temporal')(MESSAGES.TEMPORAL_QUESTION)(['yes', 'no']),
-  ];
-  const prompt = inquirer.createPromptModule();
-  return await prompt(questions);
-};
-
-const askForLogging = async (): Promise<Answers> => {
-  const questions: Question[] = [
-    generateSelect('logging')(MESSAGES.LOGGING_QUESTION)(['yes', 'no']),
   ];
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
@@ -661,9 +593,7 @@ const createRegistry = async (
     prismaSetup: boolean,
     userServiceSetup: boolean,
     monitoringSetup: boolean,
-    monitoringServicesSetup: boolean,
     temporalSetup: boolean,
-    loggingSetup: boolean,
     fileUploadSetup: boolean,
     packageManager: string
   }
@@ -679,9 +609,7 @@ const createRegistry = async (
     if (setupInfo.prismaSetup) tooling.push('prisma');
     if (setupInfo.userServiceSetup) tooling.push('userService');
     if (setupInfo.monitoringSetup) tooling.push('monitoring');
-    if (setupInfo.monitoringServicesSetup) tooling.push('monitoringService');
     if (setupInfo.temporalSetup) tooling.push('temporal');
-    if (setupInfo.loggingSetup) tooling.push('logging');
     if (setupInfo.fileUploadSetup) tooling.push('fileUpload');
 
     const packageJsonPath = path.join(projectDirectory, 'package.json');
