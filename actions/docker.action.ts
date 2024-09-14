@@ -6,12 +6,23 @@ import { AbstractCollection, Collection, CollectionFactory, SchematicOption,} fr
 import { AbstractAction } from './abstract.action';
 import { Input } from '../commands';
 import * as chalk from 'chalk';
+import * as fs from 'fs';
+import * as yaml from 'js-yaml';
+import { join } from 'path';
 
 export class DockerAction extends AbstractAction {
   private manager!: AbstractPackageManager;
   public async handle(commandInputs: Input[],options: Input[]) {
     this.manager = await PackageManagerFactory.find();
     
+    const serviceName = commandInputs[0].value as string;
+
+    const specFilePath = await this.getSpecFilePath();
+    
+    if (specFilePath) {
+      await this.updateSpecFile(specFilePath, serviceName);
+    }
+
     const collection: AbstractCollection = CollectionFactory.create(
        Collection.NESTJS,
     );
@@ -29,6 +40,49 @@ export class DockerAction extends AbstractAction {
       }
     }
   }
+  private async getSpecFilePath(): Promise<string | null> {
+    try {
+      const nestCliConfig = await fs.promises.readFile('nest-cli.json', 'utf-8');
+      const config = JSON.parse(nestCliConfig);
+      if (config.specFile) {
+        return config.specFile;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(chalk.red('Error reading nest-cli.json'), error);
+      return null;
+    }
+  }
+
+  private async updateSpecFile(specFilePath: string, serviceName: string): Promise<boolean> {
+    try {
+      const specFileFullPath = join(process.cwd(), specFilePath);
+      const specFileContent = await fs.promises.readFile(specFileFullPath, 'utf-8');
+      const spec = yaml.load(specFileContent) as any;
+      
+      if (!spec.docker) {
+        spec.docker = [];
+      }
+
+      let updated = false;
+      if (!spec.docker.includes(serviceName)) {
+        spec.docker.push(serviceName);
+        updated = true;
+      }
+
+      if (updated) {
+        const updatedYaml = yaml.dump(spec);
+        await fs.promises.writeFile(specFileFullPath, updatedYaml, 'utf-8');
+      }
+      
+      return updated;
+    } catch (error) {
+      console.error(chalk.red('Error reading or updating spec.yaml'), error);
+      return false;
+    }
+  }
+
   private mapSchematicOptions = (inputs: Input[]): SchematicOption[] => {
   const excludedInputNames = ['path','schematic', 'spec', 'flat', 'specFileSuffix'];
   const options: SchematicOption[] = [];
