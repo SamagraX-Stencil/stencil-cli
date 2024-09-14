@@ -45,6 +45,9 @@ Note: Docker command supports multiple services at a time.
 |---|---|---|
 |  `postgres` | `pg`  | Generate a docker compose for postgres |
 |  `hasura` |`hs`   | Generate a docker compose for hasura  |
+|  `minio` |`mi`   | Generate a docker compose for minio  |
+|  `fusionauth` |`fa`   | Generate a docker compose for fusionauth  |
+
 
 ## How to include new docker services ?
 
