@@ -27,6 +27,7 @@ info:
     package-manager: "npm" 
     
 tooling: [logging]
+docker: [postgres]
 
 endpoints:
 ```
@@ -34,6 +35,8 @@ endpoints:
 *Supported Package Managers are npm, yarn, pnpm and bun.*
 
 *Supported toolings are prisma, userService, temporal, monitoring, fileUpload*
+
+*Supported docker services are logging, monitoring, postgres, hasura, minio, fusionauth*
 
 [**Prisma**](https://www.prisma.io/)
 - Stencil supports Prisma ORM to make it easy to work with databases. 

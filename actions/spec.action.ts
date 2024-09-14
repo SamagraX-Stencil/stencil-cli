@@ -24,6 +24,7 @@ interface StencilSpec {
     };
   };
   tooling: string[];
+  docker?: string[]; 
   endpoints?: string[];
 }
 const spinner = ora({
@@ -98,6 +99,17 @@ export class SpecAction extends AbstractAction {
 
       command += ` --package-manager ${packageManager}`;
       await this.runCommand(command);
+
+      const dockerServices = spec.docker || [];
+      if (dockerServices.length > 0) {
+        const projectDir = join(process.cwd(), projectName);
+        const dockerCommand = `stencil docker ${dockerServices.join(' ')}`;
+        console.info(chalk.green(`Running Docker services: ${dockerServices.join(', ')}`));
+        process.chdir(projectDir);
+        // await this.runCommand('npm link @samagra-x/schematics @samagra-x/stencil-stencil'); # For testing
+        await this.runCommand(dockerCommand);
+      }
+
       console.info('\n');
       } catch (error) {
         if (error.code === 'ENOENT') {
