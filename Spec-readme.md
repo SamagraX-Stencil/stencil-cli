@@ -26,7 +26,7 @@ info:
     project-name: "ProjectName"
     package-manager: "npm" 
     
-tooling: [logging]
+tooling: [prisma]
 docker: [postgres]
 
 endpoints:
