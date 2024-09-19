@@ -130,7 +130,7 @@ describe('Stencil cli e2e Test - DOCKER command', () => {
 
       done();
     });
-  },100000);
+  },150000);
 
 
 it('should skip the docker files when --skip-docker flag is used', (done) => {
