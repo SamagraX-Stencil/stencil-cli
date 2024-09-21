@@ -1,5 +1,5 @@
 import { AbstractRunner } from '../runners';
-import { Schematic } from './nest.collection';
+import { Docker, Schematic } from './nest.collection';
 import { SchematicOption } from './schematic.option';
 
 export abstract class AbstractCollection {
@@ -17,8 +17,7 @@ export abstract class AbstractCollection {
     command = extraFlags ? command.concat(` ${extraFlags}`) : command;
     await this.runner.run(command);
   }
-
-  public abstract getSchematics(): Schematic[];
+  public abstract getSchematics(type: 'schematic' | 'docker'): Schematic[]|Docker[];
 
   private buildCommandLine(name: string, options: SchematicOption[]): string {
     return `${this.collection}:${name}${this.buildOptions(options)}`;
