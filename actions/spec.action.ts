@@ -105,10 +105,9 @@ export class SpecAction extends AbstractAction {
     );
       if (dockerServices.length > 0) {
         const projectDir = join(process.cwd(), projectName);
-        const dockerCommand = `stencill docker ${dockerServices.join(' ')}`;
+        const dockerCommand = `stencil docker ${dockerServices.join(' ')}`;
         console.info(chalk.green(`Initializing Docker services: ${dockerServices.join(', ')}`));
         process.chdir(projectDir);
-        // await this.runCommand('npm link @samagra-x/schematics @samagra-x/stencil-stencil'); # For testing
         await this.runCommand(dockerCommand);
       }
 

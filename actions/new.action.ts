@@ -116,12 +116,6 @@ export class NewAction extends AbstractAction {
       shouldInitializeTemporal as boolean,
     );
 
-    // await createLogging(
-    //   isDryRunEnabled as boolean,
-    //   projectDirectory,
-    //   shouldInitializeLogging as boolean,
-    // );
-
     await createFileUpload(
       isDryRunEnabled as boolean,
       projectDirectory,
