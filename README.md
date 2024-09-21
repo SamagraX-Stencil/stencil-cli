@@ -12,6 +12,33 @@ Read more [here](https://stencil.samagra.io/cli/introduction).
 $ npm install -g @samagra-x/stencil-cli
 ```
 
+## How to setup locally
+
+Follow these steps to set up the project locally:
+
+1. Clone the project repository using the following command:
+`git clone https://github.com/SamagraX-Stencil/stencil-cli.git`
+
+2. Install the stencil-cli package by navigating to the cloned project directory and running:
+`npm install`
+
+3. Make any required changes to the project.
+
+4. Build the project by running:
+`npm run build`
+
+5. Run the following command in the stencil-cli cloned project directory:
+`npm link`
+
+6. Navigate to a new folder where you want to use the package locally.
+
+7. Run the following command to link the local version of stencil-cli:
+`npm link @samagra-x/stencil-cli`
+
+Video Demo:
+
+https://github.com/SamagraX-Stencil/stencil-cli/assets/91362589/ee3f115a-94da-4ef6-a088-5d11df461af0
+
 ## Usage
 
 Learn more in the [official documentation](https://stencil.samagra.io/cli/introduction).
