@@ -59,6 +59,8 @@ Stencil is powered by the following open source projects
 - [nestjs-temporal]
 - [nestjs-prometheus]
 
+[![Pull Request Tests](https://github.com/vishalmaurya850/stencil-cli/actions/workflows/pull_request_tests.yml/badge.svg?branch=master&event=pull_request)](https://github.com/vishalmaurya850/stencil-cli/actions/workflows/pull_request_tests.yml)
+
 ## License
 
 Stencil is [MIT licensed](LICENSE).
