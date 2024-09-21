@@ -38,6 +38,7 @@
     "@angular-devkit/core": "16.2.3",
     "@angular-devkit/schematics": "16.2.3",
     "@angular-devkit/schematics-cli": "16.2.3",
+    "@samagra-x/schematics": "^0.0.5",
     "bun": "^1.1.7",
     "chalk": "4.1.2",
     "chokidar": "3.5.3",

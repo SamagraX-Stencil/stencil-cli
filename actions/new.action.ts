@@ -29,6 +29,7 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
+import { platform } from 'os';
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -469,15 +470,31 @@ const createFileUpload = async (
 
 //ASK FOR INPUTS
 
+const checkIfPackageManagerIsAvailable = (cmd: string): boolean => {
+  try {
+    execSync(`${cmd} -v`, { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+
+
 const askForPackageManager = async (): Promise<Answers> => {
+  const availablePackageManagers = [
+    PackageManager.NPM,
+    PackageManager.YARN,
+    PackageManager.PNPM,
+    PackageManager.BUN
+  ].filter(pm => checkIfPackageManagerIsAvailable(pm));
+
+  
+
   const questions: Question[] = [
-    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
-      PackageManager.NPM,
-      PackageManager.YARN,
-      PackageManager.PNPM,
-      PackageManager.BUN
-    ]),
+    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)(availablePackageManagers),
   ];
+
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
 };
