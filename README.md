@@ -4,7 +4,7 @@ The Stencil CLI is a command-line interface tool that helps you to initialize, d
 
 The CLI works with [schematics](https://github.com/angular/angular-cli/tree/master/packages/angular_devkit/schematics), and provides built in support from the schematics collection at [@samagra-x/schematics](https://github.com/SamagraX-stencil/schematics).
 
-Read more [here](https://stencil.samagra.io/cli/introduction).
+Read more [here](https://stencil-docs.vercel.app/cli/introduction).
 
 ## Installation
 
@@ -41,11 +41,11 @@ https://github.com/SamagraX-Stencil/stencil-cli/assets/91362589/ee3f115a-94da-4e
 
 ## Usage
 
-Learn more in the [official documentation](https://stencil.samagra.io/cli/introduction).
+Learn more in the [official documentation](https://stencil-docs.vercel.app/cli/introduction).
 
 ## Stay in touch
 
-- Website - [https://stencil.samagra.io/](https://stencil.samagra.io/cli/introduction/)
+- Website - [https://stencil.samagra.io/](https://stencil-docs.vercel.app/cli/introduction)
 
 
 ## Mentions
