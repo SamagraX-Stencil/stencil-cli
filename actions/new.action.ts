@@ -30,6 +30,7 @@ import { ClassMonitoring } from '../lib/monitoring';
 import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
+import { platform } from 'os';
 import path = require('path');
 
 export class NewAction extends AbstractAction {
@@ -49,6 +50,9 @@ export class NewAction extends AbstractAction {
 
     const shouldSkipGit = options.some(
       (option) => option.name === 'skip-git' && option.value === true,
+    );
+    const shouldSkipDocker = options.some(
+      (option) => option.name === 'skip-docker' && option.value === true,
     );
 
     const shouldInitializePrima = options.some(
@@ -108,12 +112,14 @@ export class NewAction extends AbstractAction {
       isDryRunEnabled as boolean,
       projectDirectory,
       shouldInitializeMonitoring as boolean,
+      shouldSkipDocker as boolean,
     );
 
     await createTemporal(
       isDryRunEnabled as boolean,
       projectDirectory,
       shouldInitializeTemporal as boolean,
+      shouldSkipDocker as boolean,
     );
 
     await createFileUpload(
@@ -165,8 +171,10 @@ const getFixturesInput = (inputs: Input[]) =>
 const getMonitoringInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'monitoring');
 
+
 const getTemporalInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'temporal');
+
 
 const getFileUploadInput = (inputs: Input[]) =>
   inputs.find((options) => options.name === 'fileUpload');
@@ -240,7 +248,7 @@ const generateApplicationFiles = async (args: Input[], options: Input[]) => {
   const schematicOptions: SchematicOption[] = mapSchematicOptions(
     args.concat(options),
   );
-  await collection.execute('application', schematicOptions);
+  await collection.execute('application', schematicOptions, 'schematic');
   console.info();
 };
 
@@ -376,6 +384,7 @@ const createMonitor = async (
   dryRunMode: boolean,
   createDirectory: string,
   shouldInitializeMonitoring: boolean,
+  shouldSkipDocker : boolean,
 ) => {
   if ( !shouldInitializeMonitoring) {
     return;
@@ -390,7 +399,7 @@ const createMonitor = async (
 
   const MonitoringInstance = new ClassMonitoring();
   try {
-    await MonitoringInstance.createFiles(createDirectory);
+    await MonitoringInstance.createFiles(createDirectory,  shouldSkipDocker);
   } catch (error) {
     console.error('could not generate the monitor files');
   }
@@ -400,6 +409,7 @@ const createTemporal = async (
   dryRunMode: boolean,
   createDirectory: string,
   shouldInitializeTemporal: boolean,
+  shouldSkipDocker : boolean,
 ) => {
   if (!shouldInitializeTemporal) {
     return;
@@ -414,35 +424,12 @@ const createTemporal = async (
 
   const TemporalInstance = new ClassTemporal();
   try {
-    await TemporalInstance.create(createDirectory);
+    await TemporalInstance.create(createDirectory,shouldSkipDocker);
   } catch (error) {
     console.error('could not create the temporal files');
   }
 };
 
-const createLogging = async (
-  dryRunMode: boolean,
-  createDirectory: string,
-  shouldInitializeLogging: boolean,
-) => {
-  if (!shouldInitializeLogging) {
-    return;
-  }
-
-  if (dryRunMode) {
-    console.info();
-    console.info(chalk.green(MESSAGES.DRY_RUN_MODE));
-    console.info();
-    return;
-  }
-
-  const LoggingInstance = new ClassLogging();
-  try {
-    await LoggingInstance.create(createDirectory);
-  } catch (error) {
-    console.error('could not create the logging folder');
-  }
-};
 
 const createFileUpload = async (
   dryRunMode: boolean,
@@ -470,15 +457,31 @@ const createFileUpload = async (
 
 //ASK FOR INPUTS
 
+const checkIfPackageManagerIsAvailable = (cmd: string): boolean => {
+  try {
+    execSync(`${cmd} -v`, { stdio: 'ignore' });
+    return true;
+  } catch (error) {
+    return false;
+  }
+};
+
+
+
 const askForPackageManager = async (): Promise<Answers> => {
+  const availablePackageManagers = [
+    PackageManager.NPM,
+    PackageManager.YARN,
+    PackageManager.PNPM,
+    PackageManager.BUN
+  ].filter(pm => checkIfPackageManagerIsAvailable(pm));
+
+  
+
   const questions: Question[] = [
-    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)([
-      PackageManager.NPM,
-      PackageManager.YARN,
-      PackageManager.PNPM,
-      PackageManager.BUN
-    ]),
+    generateSelect('packageManager')(MESSAGES.PACKAGE_MANAGER_QUESTION)(availablePackageManagers),
   ];
+
   const prompt = inquirer.createPromptModule();
   return await prompt(questions);
 };

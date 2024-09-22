@@ -18,6 +18,7 @@ export class NewCommand extends AbstractCommand {
       )
       .option('-g, --skip-git', 'Skip git repository initialization.', false)
       .option('-s, --skip-install', 'Skip package installation.', false)
+      .option('--sd, --skip-docker', 'Skip docker setup.', false)
       .option(
         '-p, --package-manager [packageManager]',
         'Specify package manager.',
@@ -69,6 +70,7 @@ export class NewCommand extends AbstractCommand {
         options.push({ name: 'dry-run', value: command.dryRun });
         options.push({ name: 'skip-git', value: command.skipGit });
         options.push({ name: 'skip-install', value: command.skipInstall });
+        options.push({ name: 'skip-docker', value: command.skipDocker });
         options.push({ name: 'strict', value: command.strict });
         options.push({
           name: 'packageManager',

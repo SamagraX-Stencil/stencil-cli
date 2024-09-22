@@ -1,15 +1,21 @@
 import { AbstractRunner } from '../runners';
 import { AbstractCollection } from './abstract.collection';
 import { SchematicOption } from './schematic.option';
-
+import * as chalk from 'chalk';
+import { buildSchematicsListAsTable, getCollection, getSchematics } from '../ui/table';
 export interface Schematic {
   name: string;
   alias: string;
   description: string;
 }
 
+export interface Docker {
+  name: string;
+  alias: string;
+  description: string;
+}
 export class NestCollection extends AbstractCollection {
-  private static schematics: Schematic[] = [
+  public static schematics: Schematic[] = [
     {
       name: 'application',
       alias: 'application',
@@ -146,12 +152,7 @@ export class NestCollection extends AbstractCollection {
       description: 'Generate files in a .devcontainer file.',
     },
     {
-      name: 'monitorModule',
-      alias: 'mm',
-      description: 'add monitor related imports to the app.module.ts file ',
-    },
-    {
-      name: 'monitor',
+      name: 'monitoring',
       alias: 'mf',
       description: 'Generate monitor folder.',
     },
@@ -161,41 +162,84 @@ export class NestCollection extends AbstractCollection {
       description: 'If you want to have temporal setup in the project.',
     },
     {
-      name: 'logging',
-      alias: 'lg',
-      description: 'If you want to have logging setup in the project.',
-    },
-    {
       name: 'service-file-upload',
       alias: 'fu',
       description: 'If you want to have fileUpload setup in the project.',
     },
   ];
-
+  public static docker: Docker[] = [
+    {
+      name: 'docker-app',
+      alias: 'do-app',
+      description: '',
+    },
+    {
+      name: 'logging',
+      alias: 'lg',
+      description: 'Generate a docker service for logging',
+    },
+    {
+      name: 'monitoringService',
+      alias: 'ms',
+      description: 'Generate a docker service for monitoringService',
+    },
+    {
+      name: 'temporal',
+      alias: 'tp',
+      description: 'Generate a docker service for temporal',
+    },
+    {
+      name: 'postgres',
+      alias: 'pg',
+      description: 'Generate a docker compose for postgres',
+    },
+    {
+      name: 'hasura',
+      alias: 'hs',
+      description: 'Generate a docker compose for hasura',
+    },
+    {
+      name: 'minio',
+      alias: 'mi',
+      description: 'Generate a docker compose for minio',
+    },
+    {
+      name: 'fusionauth',
+      alias: 'fa',
+      description: 'Generate a docker compose for fusionauth',
+    },
+  ];
   constructor(runner: AbstractRunner) {
     super('@samagra-x/schematics', runner);
   }
 
-  public async execute(name: string, options: SchematicOption[]) {
-    const schematic: string = this.validate(name);
+  public async execute(name: string, options: SchematicOption[],type: 'schematic' | 'docker') {
+    const schematic: string = await this.validate(name,type);
     await super.execute(schematic, options);
   }
 
-  public getSchematics(): Schematic[] {
-    return NestCollection.schematics.filter(
-      (item) => item.name !== 'angular-app',
-    );
+  public getSchematics(type: 'schematic' | 'docker'): Schematic[]|Docker[] {
+    if (type === 'schematic') {
+      return NestCollection.schematics.filter(
+        (item) => item.name !== 'angular-app',
+      );
+    } else if (type === 'docker') {
+      return NestCollection.docker.filter(
+        (item) => item.name !== 'docker-app',
+      );
+    } else {
+      throw new Error('Invalid type specified');
+    }
+
   }
 
-  private validate(name: string) {
-    const schematic = NestCollection.schematics.find(
-      (s) => s.name === name || s.alias === name,
-    );
-
-    if (schematic === undefined || schematic === null) {
-      throw new Error(
-        `Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`,
-      );
+  private async validate(name: string, type: 'schematic' | 'docker'): Promise<string> {
+    const schematic = (type === 'schematic' ? NestCollection.schematics : NestCollection.docker)
+      .find((s) => s.name === name || s.alias === name);
+    if (!schematic) {
+      const collection = await getCollection();
+      console.info(buildSchematicsListAsTable(await getSchematics(collection, type)));
+      throw new Error(`Invalid schematic "${name}". Please, ensure that "${name}" exists in this collection.`);
     }
     return schematic.name;
   }
