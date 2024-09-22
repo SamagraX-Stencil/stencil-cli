@@ -1,9 +1,10 @@
 import * as chalk from 'chalk';
 import { execSync } from 'child_process';
 import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 import * as inquirer from 'inquirer';
 import { Answers, Question } from 'inquirer';
-import { join } from 'path';
+import { join,basename } from 'path';
 import { Input } from '../commands';
 import { defaultGitIgnore } from '../lib/configuration/defaults';
 import {
@@ -30,6 +31,7 @@ import { ClassTemporal } from '../lib/temporal';
 import { ClassLogging } from '../lib/logging';
 import { ClassFileUpload } from '../lib/fileUpload';
 import { platform } from 'os';
+import path = require('path');
 
 export class NewAction extends AbstractAction {
   public async handle(inputs: Input[], options: Input[]) {
@@ -72,7 +74,6 @@ export class NewAction extends AbstractAction {
     const shouldInitializeTemporal = options.some(
       (option) => option.name === 'temporal' && option.value === 'yes',
     );
-
 
     const shouldInitializeFileUpload = options.some(
       (option) => option.name === 'fileUpload' && option.value === 'yes',
@@ -121,7 +122,6 @@ export class NewAction extends AbstractAction {
       shouldSkipDocker as boolean,
     );
 
-
     await createFileUpload(
       isDryRunEnabled as boolean,
       projectDirectory,
@@ -132,7 +132,15 @@ export class NewAction extends AbstractAction {
       if (!shouldSkipGit) {
         await initializeGitRepository(projectDirectory);
         await createGitIgnoreFile(projectDirectory);
-        await createRegistry(projectDirectory, shouldInitializePrima,shouldInitializeUserService,shouldInitializeMonitoring,shouldInitializeTemporal,shouldInitializeFileUpload);
+        await createRegistry(projectDirectory, {
+          projectName: getApplicationNameInput(inputs)!.value as string,
+          prismaSetup: shouldInitializePrima,
+          userServiceSetup: shouldInitializeUserService,
+          monitoringSetup: shouldInitializeMonitoring,
+          temporalSetup: shouldInitializeTemporal,
+          fileUploadSetup: shouldInitializeFileUpload,
+          packageManager: getPackageManagerInput(options)!.value as string
+        });
         await copyEnvFile(projectDirectory, 'env-example', '.env');
       }
 
@@ -195,50 +203,28 @@ const askForMissingInformation = async (inputs: Input[], options: Input[]) => {
     replaceInputMissingInformation(inputs, answers);
   }
 
-  const prismaInput = getPrismaInput(options);
-  if (!prismaInput!.value) {
-    const answers = await askForPrisma();
-    replaceInputMissingInformation(options, answers);
+  async function handleInput(
+    getInput: (options: any) => { value: any } | undefined,
+    askForInput: () => Promise<any>,
+    options: any
+  ) {
+    const input = getInput(options);
+    if (input && input.value === undefined) {
+      const answers = await askForInput();
+      replaceInputMissingInformation(options, answers);
+    }
   }
 
-  const userServiceInput = getUserServiceInput(options);
-  if (!userServiceInput!.value) {
-    const answers = await askForUserService();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  //UNCOMMENT THE FOLLOWING FUNCTION IF WE WANT TO MAKE THIS AN OPTION IN THE FUTURE
-
-  // const fixturesInput = getFixturesInput(options);
-  // if (!fixturesInput!.value) {
-  //   const answers = await askForFixtures();
-  //   replaceInputMissingInformation(options, answers);
-  // }
-
-  const monitoringInput = getMonitoringInput(options);
-  if (!monitoringInput!.value) {
-    const answers = await askForMonitoring();
-    replaceInputMissingInformation(options, answers);
-  }
-
-
-  const temporalInput = getTemporalInput(options);
-  if (!temporalInput!.value) {
-    const answers = await askForTemporal();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const fileUploadInput = getFileUploadInput(options);
-  if (!fileUploadInput!.value) {
-    const answers = await askForFileUpload();
-    replaceInputMissingInformation(options, answers);
-  }
-
-  const packageManagerInput = getPackageManagerInput(options);
-  if (!packageManagerInput!.value) {
-    const answers = await askForPackageManager();
-    replaceInputMissingInformation(options, answers);
-  }
+  await handleInput(getPrismaInput, askForPrisma, options);
+  await handleInput(getUserServiceInput, askForUserService, options);
+  
+  // Uncomment the following function if we want to make this an option in the future
+  // await handleInput(getFixturesInput, askForFixtures, options);
+  
+  await handleInput(getMonitoringInput, askForMonitoring, options);
+  await handleInput(getTemporalInput, askForTemporal, options);
+  await handleInput(getFileUploadInput, askForFileUpload, options);
+  await handleInput(getPackageManagerInput, askForPackageManager, options);
 };
 
 const replaceInputMissingInformation = (
@@ -393,6 +379,7 @@ const createFixtures = async (
   }
 };
 
+
 const createMonitor = async (
   dryRunMode: boolean,
   createDirectory: string,
@@ -534,7 +521,6 @@ const askForMonitoring = async (): Promise<Answers> => {
   return await prompt(questions);
 };
 
-
 const askForTemporal = async (): Promise<Answers> => {
   const questions: Question[] = [
     generateSelect('temporal')(MESSAGES.TEMPORAL_QUESTION)(['yes', 'no']),
@@ -598,29 +584,63 @@ const copyEnvFile = async (dir: string, envExample: string, envFile: string) => 
 };
 
 const createRegistry = async (
-  dir: string,
-  shouldInitializePrisma: boolean,
-  shouldInitializeUserService: boolean,
-  shouldInitializeMonitoring: boolean,
-  shouldInitializeTemporal: boolean,
-  shouldInitializeFileUpload: boolean
+  projectDirectory: string,
+  spec: {
+    projectName: string,
+    prismaSetup: boolean,
+    userServiceSetup: boolean,
+    monitoringSetup: boolean,
+    temporalSetup: boolean,
+    fileUploadSetup: boolean,
+    packageManager: string
+  }
 ): Promise<void> => {
-  const filePath = join(process.cwd(), dir, '.stencil');
-  
-  const setupInfo = [
-    shouldInitializePrisma ? 'Prisma Setup' : '',
-    shouldInitializeUserService ? 'User Services Setup' : '',
-    shouldInitializeMonitoring ? 'Monitoring Setup' : '',
-    shouldInitializeTemporal ? 'Temporal Setup' : '',
-    shouldInitializeFileUpload ? 'File Upload Setup' : ''
-  ].filter(info => info !== '').join('\n');
+  const { projectName, packageManager, ...setupInfo } = spec;
 
+  const filePath = join(process.cwd(), projectDirectory, 'spec.yaml');
+  
   try {
     await fs.promises.access(filePath, fs.constants.F_OK);
-    console.log('.stencil file already exists');
   } catch (error) {
-    await fs.promises.writeFile(filePath, setupInfo);
-    console.log('.stencil file created');
+    const tooling = [];
+    if (setupInfo.prismaSetup) tooling.push('prisma');
+    if (setupInfo.userServiceSetup) tooling.push('userService');
+    if (setupInfo.monitoringSetup) tooling.push('monitoring');
+    if (setupInfo.temporalSetup) tooling.push('temporal');
+    if (setupInfo.fileUploadSetup) tooling.push('fileUpload');
+
+    const packageJsonPath = path.join(projectDirectory, 'package.json');
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    const stencilVersion = packageJson.dependencies['@samagra-x/stencil-cli'] || packageJson.devDependencies['@samagra-x/stencil-cli'];
+
+    const yamlContent = yaml.dump({
+      stencil: stencilVersion,
+      info: {
+        properties: {
+          'project-name': projectName,
+          'package-manager': packageManager
+        }
+      },
+      tooling,
+      endpoints: []
+    });
+    await fs.promises.writeFile(filePath, yamlContent);
+    console.info(MESSAGES.SPEC_CREATED);
+  }
+  await updateNestCliConfig(spec.projectName, filePath);
+};
+const updateNestCliConfig = async (projectName: string, specFilePath: string): Promise<void> => {
+  try {
+    const nestCliPath = join(process.cwd(), projectName, 'nest-cli.json');
+    const nestCliContent = await fs.promises.readFile(nestCliPath, 'utf-8');
+    const nestCliConfig = JSON.parse(nestCliContent);
+
+    nestCliConfig.specFile = specFilePath; 
+    nestCliConfig.specFile = basename(specFilePath); 
+
+    await fs.promises.writeFile(nestCliPath, JSON.stringify(nestCliConfig, null, 2));
+  } catch (error) {
+    console.error(chalk.red(`Error updating nest-cli.json: ${error.message}`));
   }
 };
 

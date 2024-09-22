@@ -6,4 +6,5 @@ export * from './list.action';
 export * from './new.action';
 export * from './start.action';
 export * from './add.action';
+export * from './spec.action';
 export * from './docker.action';

@@ -2,7 +2,8 @@ import { Command, CommanderStatic } from 'commander';
 import { Collection } from '../lib/schematics';
 import { AbstractCommand } from './abstract.command';
 import { Input } from './command.input';
-
+import * as ora from 'ora';
+import { MESSAGES } from '../lib/ui';
 export class NewCommand extends AbstractCommand {
   public load(program: CommanderStatic) {
     program
@@ -33,30 +34,35 @@ export class NewCommand extends AbstractCommand {
         Collection.NESTJS,
       )
       .option('--strict', 'Enables strict mode in TypeScript.', false)
-      .option(
-        '--ps, --prisma [prisma]',
-        'If you want prisma setup in the project',
-      )
+      .option('--ps, --prisma [prisma]', 'If you want prisma setup in the project', (value) => {
+        return value;
+      })
+      
       .option(
         '--us, --user-service [userService]',
-        'If you user service setup in the project',
-      )
+        'If you user service setup in the project', (value) => {
+          return value;
+        })
       .option(
         '--fs, --fixtures [fixtures]',
-        'If you want to have fixtures in the project',
-      )
+        'If you want to have fixtures in the project',(value) => {
+          return value;
+        })
       .option(
         '--mo, --monitoring [monitoring]',
-        'If you want to have monitoring setup in the project',
-      )
+        'If you want to have monitoring setup in the project',(value) => {
+          return value;
+        })
       .option(
         '--te, --temporal [temporal]',
-        'If you want to have temporal setup in the project',
-      )
+        'If you want to have temporal setup in the project',(value) => {
+          return value;
+        })
       .option(
         '--fu, --fileUpload [fileUpload]',
-        'If you want to have fileUpload setup in the project',
-      )
+        'If you want to have fileUpload setup in the project',(value) => {
+          return value;
+        })
       .action(async (name: string, command: Command) => {
         const options: Input[] = [];
         const availableLanguages = ['js', 'ts', 'javascript', 'typescript'];
@@ -105,7 +111,6 @@ export class NewCommand extends AbstractCommand {
 
         const inputs: Input[] = [];
         inputs.push({ name: 'name', value: name });
-
         await this.action.handle(inputs, options);
       });
   }
