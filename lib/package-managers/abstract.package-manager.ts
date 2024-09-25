@@ -9,6 +9,7 @@ import { PackageManagerCommands } from './package-manager-commands';
 import { ProjectDependency } from './project.dependency';
 import { NpxRunner } from '../runners/npx.runner';
 import { StencilRunner } from '../runners/stencil.runner';
+import { execSync } from 'child_process';
 
 export abstract class AbstractPackageManager {
   constructor(protected runner: AbstractRunner) {}
@@ -29,6 +30,7 @@ export abstract class AbstractPackageManager {
     });
     spinner.start();
     try {
+      await this.linkPackages(directory);
       const commandArgs = `${this.cli.install} ${this.cli.silentFlag}`;
       const collect = true;
       const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
@@ -104,6 +106,19 @@ export abstract class AbstractPackageManager {
       );
     }
   }
+public async linkPackages (normalizedDirectory: string) : Promise<void> {
+  try {
+    execSync('npm link @samagra-x/schematics @samagra-x/stencil-cli', {
+      cwd: join(process.cwd(), normalizedDirectory),
+      stdio: 'pipe',
+    }); 
+
+  } catch (error) {
+    if (error && error.message) {
+      console.error(chalk.red(error.message));
+    }
+  }
+}
 
   public async version(): Promise<string> {
     const commandArguments = '--version';
