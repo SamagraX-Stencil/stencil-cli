@@ -5,7 +5,7 @@ import { AbstractAction } from './abstract.action';
 import { Input } from '../commands/command.input';
 import * as inquirer from 'inquirer';
 import { repositories } from '../lib/utils/pull-utils/repositories'; 
-import { cloneRepo, setupWithDockerfile, setupWithScript, checkDockerContainerExists } from '../lib/utils/pull-utils/serviceUtils'; // Adjust the path accordingly
+import { cloneRepo, setupWithDockerfile, setupWithScript, checkDockerContainerExists } from '../lib/utils/pull-utils/serviceUtils'; 
 
 export class PullAction extends AbstractAction {
   private manager!: AbstractPackageManager;
