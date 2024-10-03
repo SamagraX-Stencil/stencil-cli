@@ -2,7 +2,7 @@ import { AbstractRunner } from '../../../lib/runners';
 import { NestCollection } from '../../../lib/schematics/nest.collection';
 
 describe('Nest Collection', () => {
-  [
+  const schematics = [
     'application',
     'class',
     'configuration',
@@ -22,24 +22,19 @@ describe('Nest Collection', () => {
     'service',
     'sub-app',
     'resource',
-  ].forEach((schematic) => {
-    it(`should call runner with ${schematic} schematic name`, async () => {
-      const mock = jest.fn();
-      mock.mockImplementation(() => {
-        return {
-          logger: {},
-          run: jest.fn().mockImplementation(() => Promise.resolve()),
-        };
-      });
-      const mockedRunner = mock();
-      const collection = new NestCollection(mockedRunner as AbstractRunner);
-      await collection.execute(schematic, []);
-      expect(mockedRunner.run).toHaveBeenCalledWith(
-        `@samagra-x/schematics:${schematic}`,
-      );
-    });
-  });
-  [
+    'service-prisma',
+    'service-user',
+    'fixtures',
+    'husky',
+    'github',
+    'prisma',
+    'devcontainer',
+    'monitoring',
+    'service-temporal',
+    'service-file-upload',
+  ];
+
+  const aliases = [
     { name: 'application', alias: 'application' },
     { name: 'class', alias: 'cl' },
     { name: 'configuration', alias: 'config' },
@@ -59,38 +54,118 @@ describe('Nest Collection', () => {
     { name: 'service', alias: 's' },
     { name: 'sub-app', alias: 'app' },
     { name: 'resource', alias: 'res' },
-  ].forEach((schematic) => {
-    it(`should call runner with schematic ${schematic.name} name when use ${schematic.alias} alias`, async () => {
+  ];
+
+  const dockerSchematics = [
+    'logging',
+    'monitoringService',
+    'temporal',
+    'postgres',
+    'hasura',
+  ];
+
+  const dockerAliases = [
+    { name: 'logging', alias: 'lg' },
+    { name: 'monitoringService', alias: 'ms' },
+    { name: 'temporal', alias: 'tp' },
+    { name: 'postgres', alias: 'pg' },
+    { name: 'hasura', alias: 'hs' },
+  ];
+
+  schematics.forEach((schematic) => {
+    it(`should call runner with ${schematic} schematic name`, async () => {
       const mock = jest.fn();
-      mock.mockImplementation(() => {
-        return {
-          logger: {},
-          run: jest.fn().mockImplementation(() => Promise.resolve()),
-        };
-      });
+      mock.mockImplementation(() => ({
+        logger: {},
+        run: jest.fn().mockImplementation(() => Promise.resolve()),
+      }));
       const mockedRunner = mock();
       const collection = new NestCollection(mockedRunner as AbstractRunner);
-      await collection.execute(schematic.alias, []);
+      await collection.execute(schematic, [], 'schematic');
+      expect(mockedRunner.run).toHaveBeenCalledWith(
+        `@samagra-x/schematics:${schematic}`,
+      );
+    });
+  });
+
+  aliases.forEach((schematic) => {
+    it(`should call runner with schematic ${schematic.name} name when use ${schematic.alias} alias`, async () => {
+      const mock = jest.fn();
+      mock.mockImplementation(() => ({
+        logger: {},
+        run: jest.fn().mockImplementation(() => Promise.resolve()),
+      }));
+      const mockedRunner = mock();
+      const collection = new NestCollection(mockedRunner as AbstractRunner);
+      await collection.execute(schematic.alias, [], 'schematic');
       expect(mockedRunner.run).toHaveBeenCalledWith(
         `@samagra-x/schematics:${schematic.name}`,
       );
     });
   });
-  it('should throw an error when schematic name is not in nest collection', async () => {
-    const mock = jest.fn();
-    mock.mockImplementation(() => {
-      return {
+
+  dockerSchematics.forEach((schematic) => {
+    it(`should call runner with ${schematic} docker schematic name`, async () => {
+      const mock = jest.fn();
+      mock.mockImplementation(() => ({
         logger: {},
         run: jest.fn().mockImplementation(() => Promise.resolve()),
-      };
+      }));
+      const mockedRunner = mock();
+      const collection = new NestCollection(mockedRunner as AbstractRunner);
+      await collection.execute(schematic, [], 'docker');
+      expect(mockedRunner.run).toHaveBeenCalledWith(
+        `@samagra-x/schematics:${schematic}`,
+      );
     });
+  });
+
+  dockerAliases.forEach((schematic) => {
+    it(`should call runner with docker schematic ${schematic.name} name when use ${schematic.alias} alias`, async () => {
+      const mock = jest.fn();
+      mock.mockImplementation(() => ({
+        logger: {},
+        run: jest.fn().mockImplementation(() => Promise.resolve()),
+      }));
+      const mockedRunner = mock();
+      const collection = new NestCollection(mockedRunner as AbstractRunner);
+      await collection.execute(schematic.alias, [], 'docker');
+      expect(mockedRunner.run).toHaveBeenCalledWith(
+        `@samagra-x/schematics:${schematic.name}`,
+      );
+    });
+  });
+
+  it('should throw an error when schematic name is not in nest collection', async () => {
+    const mock = jest.fn();
+    mock.mockImplementation(() => ({
+      logger: {},
+      run: jest.fn().mockImplementation(() => Promise.resolve()),
+    }));
     const mockedRunner = mock();
     const collection = new NestCollection(mockedRunner as AbstractRunner);
     try {
-      await collection.execute('name', []);
+      await collection.execute('invalid-schematic', [], 'schematic');
     } catch (error) {
-      expect(error.message).toEqual(
-        'Invalid schematic "name". Please, ensure that "name" exists in this collection.',
+      expect(error.message).toContain(
+        'Invalid schematic "invalid-schematic". Please, ensure that "invalid-schematic" exists in this collection.',
+      );
+    }
+  });
+
+  it('should throw an error when docker name is not in nest collection', async () => {
+    const mock = jest.fn();
+    mock.mockImplementation(() => ({
+      logger: {},
+      run: jest.fn().mockImplementation(() => Promise.resolve()),
+    }));
+    const mockedRunner = mock();
+    const collection = new NestCollection(mockedRunner as AbstractRunner);
+    try {
+      await collection.execute('invalid-docker', [], 'docker');
+    } catch (error) {
+      expect(error.message).toContain(
+        'Invalid schematic "invalid-docker". Please, ensure that "invalid-docker" exists in this collection.',
       );
     }
   });

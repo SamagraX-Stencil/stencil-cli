@@ -3,7 +3,6 @@ import { join } from 'path';
 import { MESSAGES } from '../ui';
 import { normalizeToKebabOrSnakeCase } from '../utils/formatting';
 import { StencilRunner } from '../runners/stencil.runner';
-
 export class ClassMonitoring {
   public async addImport(directory: string) {
     const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
@@ -18,7 +17,7 @@ export class ClassMonitoring {
 
   public async initializeImport(normalizedDirectory: string): Promise<void> {
     const stencilRunner = new StencilRunner();
-    const userServiceCommand = 'g monitorModule';
+    const userServiceCommand = 'g monitoring';
     const commandArgs = `${userServiceCommand}`;
 
     try {
@@ -32,10 +31,11 @@ export class ClassMonitoring {
     }
   }
 
-  public async createFiles(directory: string) {
+  public async createFiles(directory: string,  shouldSkipDocker : boolean,) {
     const normalizedDirectory = normalizeToKebabOrSnakeCase(directory);
     try {
-      await this.generateFiles(normalizedDirectory);
+      await this.addImport(normalizedDirectory);
+      await this.generateFiles(normalizedDirectory,shouldSkipDocker);
     } catch (error) {
       console.error('Failed to create the monitor files');
     }
@@ -43,9 +43,12 @@ export class ClassMonitoring {
     console.info('Successfully created the monitor files');
   }
 
-  public async generateFiles(normalizedDirectory: string): Promise<void> {
+  public async generateFiles(normalizedDirectory: string,shouldSkipDocker: boolean): Promise<void> {
+    if(shouldSkipDocker){
+      return;
+    }
     const stencilRunner = new StencilRunner();
-    const userServiceCommand = 'g monitor';
+    const userServiceCommand = 'docker monitoringService';
     const commandArgs = `${userServiceCommand}`;
 
     try {

@@ -136,7 +136,7 @@ const generateFiles = async (inputs: Input[]) => {
     if (!schematicInput) {
       throw new Error('Unable to find a schematic for this configuration');
     }
-    await collection.execute(schematicInput.value as string, schematicOptions);
+    await collection.execute(schematicInput.value as string, schematicOptions, 'schematic');
   } catch (error) {
     if (error && error.message) {
       console.error(chalk.red(error.message));
