@@ -24,7 +24,6 @@
     "test": "jest --config test/jest-config.json",
     "test:dev": "npm run clean && jest --config test/jest-config.json --watchAll",
     "test:e2e": "jest --config test/e2e-test/jest-e2e.json",
-    "test:e2e": "jest --config test/e2e-test/jest-e2e.json",
     "prerelease": "npm run build",
     "release": "release-it",
     "prepare": "husky install"
@@ -40,6 +39,7 @@
     "@angular-devkit/schematics": "16.2.3",
     "@angular-devkit/schematics-cli": "16.2.3",
     "@samagra-x/schematics": "^0.0.5",
+    "astro": "^4.15.11",
     "bun": "^1.1.27",
     "chalk": "4.1.2",
     "chokidar": "3.5.3",
@@ -106,4 +106,3 @@
     }
   }
 }
-

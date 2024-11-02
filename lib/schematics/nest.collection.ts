@@ -166,6 +166,11 @@ export class NestCollection extends AbstractCollection {
       alias: 'fu',
       description: 'If you want to have fileUpload setup in the project.',
     },
+    {
+      name:  'pullservice',
+      alias: 'ps',
+      description: 'If you want to have pullService frontend setup in the project.',
+    }
   ];
   public static docker: Docker[] = [
     {
