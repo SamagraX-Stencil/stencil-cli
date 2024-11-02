@@ -81,7 +81,7 @@ async function runCommand(command: string): Promise<void> {
     });
 
     child.stderr?.on('data', (data) => {
-      process.stderr.write(chalk.red(data));
+      process.stderr.write((data));
     });
 
     child.on('close', (code) => {

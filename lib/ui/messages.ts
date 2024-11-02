@@ -1,5 +1,6 @@
 import * as chalk from 'chalk';
 import { EMOJIS } from './emojis';
+import { INITIALIZING_TYPE_CHECKER } from '../compiler/swc/constants';
 
 export const MESSAGES = {
   PROJECT_SELECTION_QUESTION: 'Which project would you like to generate to?',
@@ -88,4 +89,9 @@ export const MESSAGES = {
     `Unable to install library ${name} because package did not install. Please check package name.`,
   LIBRARY_INSTALLATION_FAILED_NO_LIBRARY: 'No library found.',
   LIBRARY_INSTALLATION_STARTS: 'Starting library setup...',
+  INITIALIZING_FRONTEND: 'Initializing frontend directory for pull command...',
+  INSTALLING_DEPENDENCIES: 'Installing dependencies...',
+  FRONTEND_ALREADY_INITIALIZED: 'Frontend already initialized.',
+  PULL_INSTALLATION_IN_PROGRESS: 'Pull service installation in progress...',
+  PULL_INSTALLATION_ERROR: 'Failed to install stencil pull services',
 };
